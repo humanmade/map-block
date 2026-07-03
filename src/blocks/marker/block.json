@@ -3,10 +3,10 @@
 	"apiVersion": 3,
 	"name": "hm/map-marker",
 	"version": "0.1.0",
-	"title": "Marker",
+	"title": "Map Marker",
 	"category": "widgets",
-	"icon": "admin-site",
-	"description": "",
+	"icon": "location",
+	"description": "A pinned location on a map, with associated content.",
 	"parent": [ "hm/map" ],
 	"attributes": {
 		"align": {
@@ -24,14 +24,6 @@
 		"long": {
 			"type": "number",
 			"default": 0
-		},
-		"postId": {
-			"type": "number",
-			"default": 0
-		},
-		"postType": {
-			"type": "string",
-			"default": "story"
 		}
 	},
 	"example": {},

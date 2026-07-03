@@ -27,10 +27,6 @@ let map = null;
 let mapItemIndex = 0;
 
 const mapboxStyleOptions = [
-	{
-		label: 'WMF Report',
-		value: 'mapbox://styles/mattwatsonhm/clu09j0hw00tf01p7dpw5hyv7',
-	},
 	{ label: 'Standard', value: 'mapbox://styles/mapbox/standard' },
 	{
 		label: 'Standard Satellite',
@@ -125,7 +121,7 @@ const MapPreview = ( {
 			projection,
 			renderWorldCopies: false,
 			scrollZoom: false,
-			style: mapStyle || 'mapbox://styles/mapbox/light-v11', // 'mapbox://styles/mattwatsonhm/clu09j0hw00tf01p7dpw5hyv7' >- custom grey colours.
+			style: mapStyle || 'mapbox://styles/mapbox/light-v11',
 			zoom: zoom || 1,
 		} );
 
@@ -488,7 +484,6 @@ const Edit = ( {
 		className: 'map map--carousel carousel',
 	} );
 
-	// eslint-disable-next-line no-undef
 	if ( ! hmMap.apiKey ) {
 		return (
 			<div className="components-placeholder is-large">

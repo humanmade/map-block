@@ -5,8 +5,12 @@
 	"version": "0.1.0",
 	"title": "Map",
 	"category": "widgets",
-	"icon": "admin-site",
-	"description": "",
+	"icon": "location-alt",
+	"description": "A Mapbox-backed map with markers which reveal associated content.",
+	"styles": [
+		{ "name": "stacked", "label": "Stacked", "isDefault": true },
+		{ "name": "side-by-side", "label": "Side-by-side" }
+	],
 	"attributes": {
 		"align": {
 			"type": "string",
@@ -14,7 +18,7 @@
 		},
 		"mapStyle": {
 			"type": "string",
-			"default": "mapbox://styles/mattwatsonhm/clu09j0hw00tf01p7dpw5hyv7"
+			"default": "mapbox://styles/mapbox/light-v11"
 		},
 		"markerActiveColor": {
 			"type": "string"
