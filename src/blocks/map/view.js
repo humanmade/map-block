@@ -2,6 +2,7 @@
 import { createMap } from './frontend/create-map';
 import initCarousel from './frontend/carousel';
 import initTooltips from './frontend/tooltips';
+import initStaticMap from './frontend/static-map';
 
 window.hmMap = { ...window.hmMap, mapInitialized: false };
 document.addEventListener( 'DOMContentLoaded', () => {
@@ -10,6 +11,25 @@ document.addEventListener( 'DOMContentLoaded', () => {
 		return;
 	}
 	window.hmMap.mapInitialized = true;
+
+	const mapDiv = document.getElementById( 'map' );
+	if ( ! mapDiv ) {
+		return;
+	}
+
+	const wrapper = mapDiv.closest( '.wp-block-hm-map' );
+	const markers = document.getElementsByClassName( 'wp-block-hm-map-marker' );
+	const numberedPins = mapDiv.dataset.numberedPins === 'true';
+
+	// Static render mode positions pins over background artwork and needs
+	// neither the Mapbox library nor an API key.
+	if ( mapDiv.dataset.renderMode === 'static' ) {
+		initStaticMap( { mapDiv, wrapper, markers, numberedPins } );
+		wrapper.dispatchEvent(
+			new CustomEvent( 'hm-map:ready', { detail: { map: null } } )
+		);
+		return;
+	}
 
 	// Use mapbox off of CDN-loaded window global on frontend.
 	const mapboxgl = window.mapboxgl;
@@ -24,14 +44,6 @@ document.addEventListener( 'DOMContentLoaded', () => {
 
 	mapboxgl.accessToken = hmMap.apiKey;
 
-	const mapDiv = document.getElementById( 'map' );
-	if ( ! mapDiv ) {
-		return;
-	}
-
-	const wrapper = mapDiv.closest( '.wp-block-hm-map' );
-	const markers = document.getElementsByClassName( 'wp-block-hm-map-marker' );
-
 	const map = createMap( mapboxgl, mapDiv );
 	const initDisplayMode =
 		mapDiv.dataset.displayMode === 'tooltip' ? initTooltips : initCarousel;
@@ -41,7 +53,7 @@ document.addEventListener( 'DOMContentLoaded', () => {
 		mapboxgl,
 		wrapper,
 		markers,
-		numberedPins: mapDiv.dataset.numberedPins === 'true',
+		numberedPins,
 	} );
 
 	wrapper.dispatchEvent(

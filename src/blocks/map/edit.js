@@ -3,12 +3,16 @@ import { __ } from '@wordpress/i18n';
 import { createBlock } from '@wordpress/blocks';
 import {
 	InspectorControls,
+	MediaUpload,
+	MediaUploadCheck,
 	useBlockProps,
 	withColors,
 } from '@wordpress/block-editor';
 import {
 	// eslint-disable-next-line @wordpress/no-unsafe-wp-apis
 	__experimentalNumberControl as NumberControl,
+	BaseControl,
+	Button,
 	PanelBody,
 	TextControl,
 	SelectControl,
@@ -23,6 +27,7 @@ import './editor.scss';
 import InnerBlocksDisplaySingle from '../../components/inner-block-slider/inner-block-single-display';
 import Navigation from '../../components/inner-block-slider/navigation';
 import PaletteColorPicker from '../../components/palette-color-picker';
+import projectPoint from './project-point';
 
 let map = null;
 let mapItemIndex = 0;
@@ -228,6 +233,65 @@ const MapPreview = ( {
 };
 
 /**
+ * Editor preview for the static render mode: artwork plus projected pins.
+ *
+ * @param {Object}   props              React component props.
+ * @param {string}   props.imageUrl     Background artwork URL.
+ * @param {Object}   props.bounds       Geographic bounds of the artwork.
+ * @param {string}   props.projection   equirectangular or mercator.
+ * @param {Object[]} props.slideBlocks  Marker block array.
+ * @param {boolean}  props.numberedPins Whether pins display their number.
+ * @param {Function} props.onPinClick   Called with the clicked marker's index.
+ * @return {Element} Static preview element.
+ */
+const StaticMapPreview = ( {
+	imageUrl,
+	bounds,
+	projection,
+	slideBlocks,
+	numberedPins,
+	onPinClick,
+} ) => (
+	<div className="hm-map-static-preview">
+		{ imageUrl ? (
+			<img className="map__static-image" src={ imageUrl } alt="" />
+		) : (
+			<div className="hm-map-static-preview__placeholder">
+				{ __(
+					'Select a background image to position markers against.',
+					'hm-map-block'
+				) }
+			</div>
+		) }
+		{ slideBlocks.map( ( block, index ) => {
+			const point = projectPoint(
+				{
+					lat: block.attributes.lat,
+					long: block.attributes.long,
+				},
+				{ bounds, projection }
+			);
+			if ( ! point ) {
+				return null;
+			}
+			return (
+				<button
+					key={ block.clientId }
+					className="marker"
+					style={ {
+						left: `${ point.x }%`,
+						top: `${ point.y }%`,
+					} }
+					onClick={ () => onPinClick( index, block.clientId ) }
+				>
+					{ numberedPins ? index + 1 : '' }
+				</button>
+			);
+		} ) }
+	</div>
+);
+
+/**
  * The edit function describes the structure of your block in the context of the
  * editor. This represents what the editor will render when the block is used.
  *
@@ -252,8 +316,20 @@ const Edit = ( {
 	markerColor,
 	setMarkerColor,
 } ) => {
-	const { displayMode, mapStyle, mobileBehavior, numberedPins } = attributes;
+	const {
+		boundsEast,
+		boundsNorth,
+		boundsSouth,
+		boundsWest,
+		displayMode,
+		mapStyle,
+		mobileBehavior,
+		numberedPins,
+		renderMode,
+		staticImageUrl,
+	} = attributes;
 	const isTooltipMode = displayMode === 'tooltip';
+	const isStatic = isTooltipMode && renderMode === 'static';
 	const showPinNumbers = isTooltipMode && numberedPins;
 
 	// Get the innerBlocks (slideBlocks).
@@ -303,7 +379,13 @@ const Edit = ( {
 	 * Add Slide Function.
 	 */
 	const addSlide = () => {
-		const center = map?.getCenter();
+		// In static mode there is no map instance; start at the bounds center.
+		const center = isStatic
+			? {
+					lat: ( boundsNorth + boundsSouth ) / 2,
+					lng: ( boundsWest + boundsEast ) / 2,
+			  }
+			: map?.getCenter();
 		if ( ! center ) {
 			return;
 		}
@@ -492,11 +574,12 @@ const Edit = ( {
 
 	const blockProps = useBlockProps( {
 		className: isTooltipMode
-			? 'map map--tooltips'
+			? `map map--tooltips${ isStatic ? ' map--static' : '' }`
 			: 'map map--carousel carousel',
 	} );
 
-	if ( ! hmMap.apiKey ) {
+	// Static mode needs no Mapbox API key.
+	if ( ! hmMap.apiKey && ! isStatic ) {
 		return (
 			<div className="components-placeholder is-large">
 				<div className="components-placeholder__fieldset">
@@ -569,6 +652,33 @@ const Edit = ( {
 					/>
 					{ isTooltipMode && (
 						<>
+							<SelectControl
+								label={ __( 'Map rendering', 'hm-map-block' ) }
+								help={ __(
+									'Static image mode positions pins over fixed artwork with known geographic bounds, without using Mapbox at all.',
+									'hm-map-block'
+								) }
+								options={ [
+									{
+										label: __(
+											'Interactive (Mapbox)',
+											'hm-map-block'
+										),
+										value: 'interactive',
+									},
+									{
+										label: __(
+											'Static image',
+											'hm-map-block'
+										),
+										value: 'static',
+									},
+								] }
+								value={ renderMode }
+								onChange={ ( value ) =>
+									setAttributes( { renderMode: value } )
+								}
+							/>
 							<ToggleControl
 								label={ __( 'Numbered pins', 'hm-map-block' ) }
 								help={ __(
@@ -614,29 +724,39 @@ const Edit = ( {
 							/>
 						</>
 					) }
-					<SelectControl
-						label={ __( 'Select Mapbox style', 'hm-map-block' ) }
-						help={ __(
-							'Change the style associated with the map',
-							'hm-map-block'
-						) }
-						options={ mapboxStyleOptions }
-						// eslint-disable-next-line no-shadow
-						onChange={ ( mapStyle ) =>
-							setAttributes( { mapStyle } )
-						}
-						value={ customStyleSelected ? '' : mapStyle }
-					/>
-					{ customStyleSelected ? (
-						<TextControl
-							label={ __( 'Custom style', 'hm-map-block' ) }
-							value={ mapStyle }
-							// eslint-disable-next-line no-shadow
-							onChange={ ( mapStyle ) => {
-								setAttributes( { mapStyle } );
-							} }
-						/>
-					) : null }
+					{ ! isStatic && (
+						<>
+							<SelectControl
+								label={ __(
+									'Select Mapbox style',
+									'hm-map-block'
+								) }
+								help={ __(
+									'Change the style associated with the map',
+									'hm-map-block'
+								) }
+								options={ mapboxStyleOptions }
+								// eslint-disable-next-line no-shadow
+								onChange={ ( mapStyle ) =>
+									setAttributes( { mapStyle } )
+								}
+								value={ customStyleSelected ? '' : mapStyle }
+							/>
+							{ customStyleSelected ? (
+								<TextControl
+									label={ __(
+										'Custom style',
+										'hm-map-block'
+									) }
+									value={ mapStyle }
+									// eslint-disable-next-line no-shadow
+									onChange={ ( mapStyle ) => {
+										setAttributes( { mapStyle } );
+									} }
+								/>
+							) : null }
+						</>
+					) }
 					<SelectControl
 						label={ __( 'Choose projection', 'hm-map-block' ) }
 						options={ [
@@ -651,40 +771,168 @@ const Edit = ( {
 							setAttributes( { projection } )
 						}
 					/>
-					<NumberControl
-						label={ __( 'Center point latitude', 'hm-map-block' ) }
-						value={ attributes.centerLat }
-						onChange={ ( centerLat ) =>
-							setAttributes( {
-								centerLat: parseFloat( centerLat ),
-							} )
-						}
-					/>
-					<NumberControl
-						label={ __( 'Center point longitude', 'hm-map-block' ) }
-						value={ attributes.centerLon }
-						onChange={ ( centerLon ) =>
-							setAttributes( {
-								centerLon: parseFloat( centerLon ),
-							} )
-						}
-					/>
-					<NumberControl
-						label={ __( 'Initial zoom level', 'hm-map-block' ) }
-						value={ attributes.zoom }
-						onChange={ ( zoom ) =>
-							setAttributes( { zoom: parseFloat( zoom ) } )
-						}
-					/>
+					{ ! isStatic && (
+						<>
+							<NumberControl
+								label={ __(
+									'Center point latitude',
+									'hm-map-block'
+								) }
+								value={ attributes.centerLat }
+								onChange={ ( centerLat ) =>
+									setAttributes( {
+										centerLat: parseFloat( centerLat ),
+									} )
+								}
+							/>
+							<NumberControl
+								label={ __(
+									'Center point longitude',
+									'hm-map-block'
+								) }
+								value={ attributes.centerLon }
+								onChange={ ( centerLon ) =>
+									setAttributes( {
+										centerLon: parseFloat( centerLon ),
+									} )
+								}
+							/>
+							<NumberControl
+								label={ __(
+									'Initial zoom level',
+									'hm-map-block'
+								) }
+								value={ attributes.zoom }
+								onChange={ ( zoom ) =>
+									setAttributes( {
+										zoom: parseFloat( zoom ),
+									} )
+								}
+							/>
+						</>
+					) }
 				</PanelBody>
+				{ isStatic && (
+					<PanelBody
+						title={ __( 'Static map image', 'hm-map-block' ) }
+					>
+						<MediaUploadCheck>
+							<BaseControl
+								id="hm-map-static-image"
+								label={ __(
+									'Background image',
+									'hm-map-block'
+								) }
+								help={ __(
+									'Any map artwork with known geographic bounds, e.g. an export from the Mapbox Static Images API or a stylized world map.',
+									'hm-map-block'
+								) }
+							>
+								<MediaUpload
+									allowedTypes={ [ 'image' ] }
+									value={ attributes.staticImageId }
+									onSelect={ ( media ) =>
+										setAttributes( {
+											staticImageId: media.id,
+											staticImageUrl: media.url,
+										} )
+									}
+									render={ ( { open } ) => (
+										<Button
+											variant="secondary"
+											onClick={ open }
+										>
+											{ staticImageUrl
+												? __(
+														'Replace image',
+														'hm-map-block'
+												  )
+												: __(
+														'Select image',
+														'hm-map-block'
+												  ) }
+										</Button>
+									) }
+								/>
+							</BaseControl>
+						</MediaUploadCheck>
+						<NumberControl
+							label={ __(
+								'West bound (longitude)',
+								'hm-map-block'
+							) }
+							value={ boundsWest }
+							onChange={ ( value ) =>
+								setAttributes( {
+									boundsWest: parseFloat( value ),
+								} )
+							}
+						/>
+						<NumberControl
+							label={ __(
+								'East bound (longitude)',
+								'hm-map-block'
+							) }
+							value={ boundsEast }
+							onChange={ ( value ) =>
+								setAttributes( {
+									boundsEast: parseFloat( value ),
+								} )
+							}
+						/>
+						<NumberControl
+							label={ __(
+								'North bound (latitude)',
+								'hm-map-block'
+							) }
+							value={ boundsNorth }
+							onChange={ ( value ) =>
+								setAttributes( {
+									boundsNorth: parseFloat( value ),
+								} )
+							}
+						/>
+						<NumberControl
+							label={ __(
+								'South bound (latitude)',
+								'hm-map-block'
+							) }
+							value={ boundsSouth }
+							onChange={ ( value ) =>
+								setAttributes( {
+									boundsSouth: parseFloat( value ),
+								} )
+							}
+						/>
+					</PanelBody>
+				) }
 			</InspectorControls>
-			<MapPreview
-				{ ...{ mapStyle, slideBlocks, updateMarkers } }
-				projection={ attributes.projection }
-				latitude={ attributes.centerLat }
-				longitude={ attributes.centerLon }
-				zoom={ attributes.zoom }
-			/>
+			{ isStatic ? (
+				<StaticMapPreview
+					imageUrl={ staticImageUrl }
+					bounds={ {
+						west: boundsWest,
+						east: boundsEast,
+						north: boundsNorth,
+						south: boundsSouth,
+					} }
+					projection={ attributes.projection }
+					slideBlocks={ slideBlocks }
+					numberedPins={ numberedPins }
+					onPinClick={ ( index, blockClientId ) => {
+						setCurrentItemIndex( index );
+						selectBlock( blockClientId );
+					} }
+				/>
+			) : (
+				<MapPreview
+					{ ...{ mapStyle, slideBlocks, updateMarkers } }
+					projection={ attributes.projection }
+					latitude={ attributes.centerLat }
+					longitude={ attributes.centerLon }
+					zoom={ attributes.zoom }
+				/>
+			) }
 			<div className="inner-block-slider">
 				<InnerBlocksDisplaySingle
 					allowedBlocks={ [ 'hm/map-marker' ] }

@@ -345,3 +345,67 @@
 		}
 	}
 }
+
+/* Static render mode: artwork + projected pins, no Mapbox. */
+.wp-block-hm-map.map--static {
+
+	#map {
+		min-height: 0;
+		position: relative;
+	}
+
+	.map__static-image {
+		display: block;
+		height: auto;
+		width: 100%;
+	}
+
+	.marker {
+		border: none;
+		padding: 0;
+		position: absolute;
+		transform: translate(-50%, -50%);
+	}
+
+	.hm-map-popup--static {
+		background: var(--hm-map-popup-background, #fff);
+		border-radius: var(--hm-map-popup-radius, 0.25rem);
+		box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+		color: var(--hm-map-popup-color, inherit);
+		max-width: var(--hm-map-popup-max-width, 20rem);
+		min-width: 12rem;
+		padding: 1rem;
+		position: absolute;
+		transform: translate(-50%, calc(-100% - 1.5rem));
+		z-index: 2;
+
+		// Caret pointing at the pin.
+		&::after {
+			border: 0.5rem solid transparent;
+			border-top-color: var(--hm-map-popup-background, #fff);
+			content: "";
+			left: 50%;
+			position: absolute;
+			top: 100%;
+			transform: translateX(-50%);
+		}
+
+		img {
+			height: auto;
+			max-width: 100%;
+		}
+	}
+
+	.hm-map-popup__close {
+		background: none;
+		border: none;
+		color: inherit;
+		cursor: pointer;
+		font-size: 1rem;
+		line-height: 1;
+		padding: 0.25rem;
+		position: absolute;
+		right: 0.25rem;
+		top: 0.25rem;
+	}
+}

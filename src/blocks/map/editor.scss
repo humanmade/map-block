@@ -35,3 +35,19 @@
 		}
 	}
 }
+
+/* Static render mode editor preview. */
+.hm-map-static-preview {
+	position: relative;
+
+	.hm-map-static-preview__placeholder {
+		align-items: center;
+		background: #f0f0f0;
+		color: #333;
+		display: flex;
+		justify-content: center;
+		min-height: 250px;
+		padding: 2rem;
+		text-align: center;
+	}
+}

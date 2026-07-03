@@ -24,6 +24,34 @@
 			"type": "string",
 			"default": "carousel"
 		},
+		"renderMode": {
+			"type": "string",
+			"default": "interactive"
+		},
+		"staticImageUrl": {
+			"type": "string",
+			"default": ""
+		},
+		"staticImageId": {
+			"type": "number",
+			"default": 0
+		},
+		"boundsWest": {
+			"type": "number",
+			"default": -180
+		},
+		"boundsEast": {
+			"type": "number",
+			"default": 180
+		},
+		"boundsNorth": {
+			"type": "number",
+			"default": 85
+		},
+		"boundsSouth": {
+			"type": "number",
+			"default": -85
+		},
 		"numberedPins": {
 			"type": "boolean",
 			"default": true
