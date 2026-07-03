@@ -1,18 +1,18 @@
-/* global wmf:false */
+/* global hmMap:false */
 import scrollToElement from '../../helpers/scroll-to-element';
 
-window.wmf = { ...window.wmf, mapInitialized: false };
+window.hmMap = { ...window.hmMap, mapInitialized: false };
 document.addEventListener( 'DOMContentLoaded', () => {
 	// Avoid double-rendering in DevServer mode. Testing requires a full page reload.
-	if ( window.wmf.mapInitialized ) {
+	if ( window.hmMap.mapInitialized ) {
 		return;
 	}
-	window.wmf.mapInitialized = true;
+	window.hmMap.mapInitialized = true;
 
 	// Use mapbox off of CDN-loaded window global on frontend.
 	const mapboxgl = window.mapboxgl;
 
-	if ( ! wmf?.apiKey || ! mapboxgl ) {
+	if ( ! hmMap?.apiKey || ! mapboxgl ) {
 		// eslint-disable-next-line no-console
 		console.error(
 			'Unable to initialize mapbox. API key or mapbox global unavailable.'
@@ -20,11 +20,11 @@ document.addEventListener( 'DOMContentLoaded', () => {
 		return;
 	}
 
-	mapboxgl.accessToken = wmf.apiKey;
+	mapboxgl.accessToken = hmMap.apiKey;
 
 	const mapDiv = document.getElementById( 'map' );
 	const markers = document.getElementsByClassName(
-		'wp-block-wmf-reports-marker'
+		'wp-block-hm-map-marker'
 	);
 	const backButton = document.getElementById( 'map-back' );
 	const forwardButton = document.getElementById( 'map-forward' );
@@ -69,7 +69,7 @@ document.addEventListener( 'DOMContentLoaded', () => {
 		);
 
 		const currentSlide = document.querySelector(
-			'.wp-block-wmf-reports-marker[style*="visibility: visible"]'
+			'.wp-block-hm-map-marker[style*="visibility: visible"]'
 		);
 		let currentId = 0;
 		if ( currentSlide ) {

@@ -4,10 +4,10 @@
  */
 declare( strict_types=1 );
 
-namespace WMF\Reports\Blocks\Map;
+namespace HM\MapBlock\Settings;
 
-const MAP_API_OPTION_KEY        = 'wmf-map-api-key';
-const MAP_SETTINGS_NONCE_ACTION = 'wmf-update-map-settings';
+const MAP_API_OPTION_KEY        = 'hm_map_api_key';
+const MAP_SETTINGS_NONCE_ACTION = 'hm-update-map-settings';
 
 /**
  * Attach hooks and filters.
@@ -25,7 +25,7 @@ function bootstrap() {
  */
 function register_map_settings() : void {
 	register_setting(
-		'wmf-settings',
+		'hm_map_settings',
 		MAP_API_OPTION_KEY,
 		[
 			'default'      => '',
@@ -42,8 +42,8 @@ function register_map_settings() : void {
  */
 function add_map_settings_page() : void {
 	add_options_page(
-		esc_html__( 'Map Settings', 'wmf-reports' ),
-		esc_html__( 'Map Settings', 'wmf-reports' ),
+		esc_html__( 'Map Settings', 'hm-map-block' ),
+		esc_html__( 'Map Settings', 'hm-map-block' ),
 		'manage_options',
 		'map_settings',
 		__NAMESPACE__ . '\\render_map_settings_admin_page'
@@ -56,21 +56,21 @@ function add_map_settings_page() : void {
 function render_map_settings_admin_page() : void {
 ?>
 <div class="wrap">
-    <h1><?php esc_html_e( 'Map Settings', 'wmf-reports' ); ?></h1>
-    <p><?php esc_html_e( 'This admin screen lets you manage your map settings.', 'wmf-reports' ); ?></p>
+    <h1><?php esc_html_e( 'Map Settings', 'hm-map-block' ); ?></h1>
+    <p><?php esc_html_e( 'This admin screen lets you manage your map settings.', 'hm-map-block' ); ?></p>
 
     <form method="post">
         <?php
 			$api_key = (string) get_option( MAP_API_OPTION_KEY, '' );
 			?>
 
-        <h2 class="title"><?php esc_html_e( 'API Key', 'wmf-reports' ); ?></h2>
-        <p><?php esc_html_e( 'Use this section to manage your API Key.', 'wmf-reports' ); ?></p>
+        <h2 class="title"><?php esc_html_e( 'API Key', 'hm-map-block' ); ?></h2>
+        <p><?php esc_html_e( 'Use this section to manage your API Key.', 'hm-map-block' ); ?></p>
         <table class="form-table permalink-structure" role="presentation">
             <tbody>
                 <tr>
                     <th scope="row">
-                        <label for="map_api_key"><?php esc_html_e( 'Mapbox API Key', 'wmf-reports' ); ?></label>
+                        <label for="map_api_key"><?php esc_html_e( 'Mapbox API Key', 'hm-map-block' ); ?></label>
                     </th>
                     <td>
                         <p>
@@ -79,7 +79,7 @@ function render_map_settings_admin_page() : void {
 							<p class="description">
 								<?php
 								printf(
-									esc_html__( 'Follow the instructions on the %sMapbox website%s to create your API key.', 'wmf-reports' ),
+									esc_html__( 'Follow the instructions on the %sMapbox website%s to create your API key.', 'hm-map-block' ),
 									'<a href="https://docs.mapbox.com/help/getting-started/access-tokens/">',
 									'</a>'
 								)
@@ -129,7 +129,7 @@ function save_map_settings_options() : void {
  */
 function show_updated_notice() : void {
 	$class   = 'notice notice-success is-dismissible';
-	$message = esc_html__( 'Settings Saved.', 'wmf-reports' );
+	$message = esc_html__( 'Settings Saved.', 'hm-map-block' );
 
 	printf( '<div class="%1$s"><p><strong>%2$s</strong></p></div>', esc_attr( $class ), esc_html( $message ) );
 }

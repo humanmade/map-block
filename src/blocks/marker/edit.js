@@ -35,7 +35,7 @@ export default function Edit( { attributes, clientId, setAttributes } ) {
 	};
 	const { id, lat, long, postId, postType } = attributes;
 	// eslint-disable-next-line no-undef
-	const isWend = wmf.theme === 'wikimedia-endow';
+	const isWend = hmMap.theme === 'wikimedia-endow';
 
 	useEffect( () => {
 		// Ensure every block has a unique[-enough] ID.
@@ -112,7 +112,7 @@ export default function Edit( { attributes, clientId, setAttributes } ) {
 					backgroundColor: isWend
 						? 'light-blue'
 						: 'wmf-report-bright-yellow',
-					className: 'wmf-pattern-reports-carousel-slide',
+					className: 'hm-map-slide',
 					layout: { type: 'constrained' },
 				},
 				[
@@ -124,12 +124,12 @@ export default function Edit( { attributes, clientId, setAttributes } ) {
 								createBlock( 'core/image', {
 									aspectRatio: isWend ? '1/1' : '4/3',
 									className:
-										'is-style-default wmf-pattern-reports-carousel-slide__image',
+										'is-style-default hm-map-slide__image',
 									id: imageId || 74197,
 									lightbox: {
 										aspectRatio: isWend ? '1/1' : '4/3',
 										className:
-											'is-style-default wmf-pattern-reports-carousel-slide__image',
+											'is-style-default hm-map-slide__image',
 										enabled: false,
 										id: imageId || 74197,
 										linkDestination: 'none',
@@ -151,7 +151,7 @@ export default function Edit( { attributes, clientId, setAttributes } ) {
 						createBlock( 'core/column', { width: '33.33%' }, [
 							createBlock( 'core/paragraph', {
 								className:
-									'wmf-pattern-reports-carousel-slide__category is-style-sans-p',
+									'hm-map-slide__category is-style-sans-p',
 								content: 'Lorem ipsum / Sit amet',
 								style: {
 									elements: {
@@ -166,7 +166,7 @@ export default function Edit( { attributes, clientId, setAttributes } ) {
 							} ),
 							createBlock( 'core/heading', {
 								className:
-									'wmf-pattern-reports-carousel-slide__heading is-style-h2',
+									'hm-map-slide__heading is-style-h2',
 								content: `<strong>${
 									heading ||
 									'Lorem ipsum dolor sit amet vulputate.'
@@ -175,7 +175,7 @@ export default function Edit( { attributes, clientId, setAttributes } ) {
 							} ),
 							createBlock( 'core/paragraph', {
 								className:
-									'wmf-pattern-reports-carousel-slide__location is-style-sans-p',
+									'hm-map-slide__location is-style-sans-p',
 								content: '<em>Line for location</em>',
 							} ),
 							createBlock( 'core/paragraph', {
@@ -190,7 +190,7 @@ export default function Edit( { attributes, clientId, setAttributes } ) {
 										? 'white'
 										: 'base100',
 									className:
-										'is-style-tertiary wmf-pattern-reports-carousel-slide__button overlay__trigger',
+										'is-style-tertiary hm-map-slide__button overlay__trigger',
 									text: 'Read More',
 									style: {
 										elements: {
@@ -219,7 +219,7 @@ export default function Edit( { attributes, clientId, setAttributes } ) {
 					createBlock(
 						'core/group',
 						{
-							className: 'wmf-pattern-overlay',
+							className: 'hm-map-overlay',
 						},
 						[
 							createBlock(
@@ -233,7 +233,7 @@ export default function Edit( { attributes, clientId, setAttributes } ) {
 								[
 									createBlock( 'core/paragraph', {
 										className:
-											'wmf-pattern-overlay__category is-style-sans-p',
+											'hm-map-overlay__category is-style-sans-p',
 										content:
 											'<strong>Lorem ipsum / Sit amet</strong>',
 										style: {
@@ -249,7 +249,7 @@ export default function Edit( { attributes, clientId, setAttributes } ) {
 									} ),
 									createBlock( 'core/heading', {
 										className:
-											'wmf-pattern-overlay__heading is-style-h2',
+											'hm-map-overlay__heading is-style-h2',
 										content: `<strong>${
 											heading ||
 											'Lorem ipsum dolor sit amet imperdiet</strong>'
@@ -258,19 +258,19 @@ export default function Edit( { attributes, clientId, setAttributes } ) {
 									} ),
 									createBlock( 'core/paragraph', {
 										className:
-											'wmf-pattern-overlay__location is-style-sans-p',
+											'hm-map-overlay__location is-style-sans-p',
 										content:
 											'<em>Optional line for location</em>',
 									} ),
 									createBlock( 'core/image', {
 										aspectRatio: '4/3',
 										className:
-											'is-style-default wmf-pattern-overlay__image',
+											'is-style-default hm-map-overlay__image',
 										id: imageId || 74197,
 										lightbox: {
 											aspectRatio: '4/3',
 											className:
-												'is-style-default wmf-pattern-overlay__image',
+												'is-style-default hm-map-overlay__image',
 											enabled: false,
 											id: imageId || 74197,
 											linkDestination: 'none',
@@ -310,14 +310,14 @@ export default function Edit( { attributes, clientId, setAttributes } ) {
 					<BaseControl
 						help={ __(
 							'Search for the address to update the longitude and latitude',
-							'wmf-reports'
+							'hm-map-block'
 						) }
 						id="search-box"
-						label={ __( 'Search for address', 'wmf-reports' ) }
+						label={ __( 'Search for address', 'hm-map-block' ) }
 					>
 						<SearchBox
 							// eslint-disable-next-line no-undef
-							accessToken={ wmf?.apiKey }
+							accessToken={ hmMap?.apiKey }
 							value=""
 							onRetrieve={ ( object ) => {
 								const { coordinates } = object?.features?.[ 0 ]
@@ -334,9 +334,9 @@ export default function Edit( { attributes, clientId, setAttributes } ) {
 					<TextControl
 						help={ __(
 							'Update the latitude, use the search, or drag the marker to pin point a location.',
-							'wmf-reports'
+							'hm-map-block'
 						) }
-						label={ __( 'Latitude', 'wmf-reports' ) }
+						label={ __( 'Latitude', 'hm-map-block' ) }
 						value={ lat }
 						// eslint-disable-next-line no-shadow
 						onChange={ ( lat ) => {
@@ -346,9 +346,9 @@ export default function Edit( { attributes, clientId, setAttributes } ) {
 					<TextControl
 						help={ __(
 							'Update the longitude, use the search, or drag the marker to pin point a location.',
-							'wmf-reports'
+							'hm-map-block'
 						) }
-						label={ __( 'Longitude', 'wmf-reports' ) }
+						label={ __( 'Longitude', 'hm-map-block' ) }
 						value={ long }
 						// eslint-disable-next-line no-shadow
 						onChange={ ( long ) => {
@@ -359,10 +359,10 @@ export default function Edit( { attributes, clientId, setAttributes } ) {
 				{ ! isWend && (
 					<PanelBody>
 						<SelectControl
-							label={ __( 'Choose Post Type', 'wmf-reports' ) }
+							label={ __( 'Choose Post Type', 'hm-map-block' ) }
 							help={ __(
 								'Altering the post type will allow you to choose posts from that post type using the select post button below.',
-								'wmf-reports'
+								'hm-map-block'
 							) }
 							options={ [
 								{
@@ -396,10 +396,10 @@ export default function Edit( { attributes, clientId, setAttributes } ) {
 							className="story-base-control"
 							help={ __(
 								'Associate this post with a slide. Once you have chosen a post use the button below to refresh the slide content.',
-								'wmf-reports'
+								'hm-map-block'
 							) }
-							id={ __( 'Associated Post', 'wmf-reports' ) }
-							label={ __( 'Associated Post', 'wmf-reports' ) }
+							id={ __( 'Associated Post', 'hm-map-block' ) }
+							label={ __( 'Associated Post', 'hm-map-block' ) }
 						>
 							<PostSelectButton
 								maxPosts={ 1 }
@@ -408,7 +408,7 @@ export default function Edit( { attributes, clientId, setAttributes } ) {
 								onSelect={ onPostSelect }
 							>
 								<span className="components-button is-secondary">
-									{ __( 'Select post', 'wmf-reports' ) }
+									{ __( 'Select post', 'hm-map-block' ) }
 								</span>
 							</PostSelectButton>
 						</BaseControl>
@@ -417,22 +417,22 @@ export default function Edit( { attributes, clientId, setAttributes } ) {
 								className="story-base-control"
 								help={ __(
 									'Pull the slide content from the associated post.',
-									'wmf-reports'
+									'hm-map-block'
 								) }
 								id={ __(
 									'Refresh Slide Content',
-									'wmf-reports'
+									'hm-map-block'
 								) }
 								label={ __(
 									'Refresh Slide Content',
-									'wmf-reports'
+									'hm-map-block'
 								) }
 							>
 								<Button
 									variant="secondary"
 									onClick={ updateSlide }
 								>
-									{ __( 'Refresh Slide', 'wmf-reports' ) }
+									{ __( 'Refresh Slide', 'hm-map-block' ) }
 								</Button>
 							</BaseControl>
 						) }
@@ -448,7 +448,7 @@ export default function Edit( { attributes, clientId, setAttributes } ) {
 							backgroundColor: isWend
 								? 'light-blue'
 								: 'wmf-report-bright-yellow',
-							className: 'wmf-pattern-reports-carousel-slide',
+							className: 'hm-map-slide',
 							layout: { type: 'constrained' },
 						},
 						[
@@ -467,14 +467,14 @@ export default function Edit( { attributes, clientId, setAttributes } ) {
 														? '1/1'
 														: '4/3',
 													className:
-														'is-style-default wmf-pattern-reports-carousel-slide__image',
+														'is-style-default hm-map-slide__image',
 													id: 74197,
 													lightbox: {
 														aspectRatio: isWend
 															? '1/1'
 															: '4/3',
 														className:
-															'is-style-default wmf-pattern-reports-carousel-slide__image',
+															'is-style-default hm-map-slide__image',
 														enabled: false,
 														id: 74197,
 														linkDestination: 'none',
@@ -498,7 +498,7 @@ export default function Edit( { attributes, clientId, setAttributes } ) {
 												'core/paragraph',
 												{
 													className:
-														'wmf-pattern-reports-carousel-slide__category is-style-sans-p',
+														'hm-map-slide__category is-style-sans-p',
 													content:
 														'Lorem ipsum / Sit amet',
 													style: {
@@ -517,7 +517,7 @@ export default function Edit( { attributes, clientId, setAttributes } ) {
 												'core/heading',
 												{
 													className:
-														'wmf-pattern-reports-carousel-slide__heading is-style-h2',
+														'hm-map-slide__heading is-style-h2',
 													content:
 														'<strong>Lorem ipsum dolor sit amet vulputate.</strong>',
 													level: 3,
@@ -527,7 +527,7 @@ export default function Edit( { attributes, clientId, setAttributes } ) {
 												'core/paragraph',
 												{
 													className:
-														'wmf-pattern-reports-carousel-slide__location is-style-sans-p',
+														'hm-map-slide__location is-style-sans-p',
 													content:
 														'<em>Line for location</em>',
 												},
@@ -553,7 +553,7 @@ export default function Edit( { attributes, clientId, setAttributes } ) {
 																	? 'white'
 																	: 'base100',
 															className:
-																'is-style-tertiary wmf-pattern-reports-carousel-slide__button overlay__trigger',
+																'is-style-tertiary hm-map-slide__button overlay__trigger',
 															text: 'Read More',
 															style: {
 																elements: {
@@ -583,7 +583,7 @@ export default function Edit( { attributes, clientId, setAttributes } ) {
 							[
 								'core/group',
 								{
-									className: 'wmf-pattern-overlay',
+									className: 'hm-map-overlay',
 								},
 								[
 									[
@@ -599,7 +599,7 @@ export default function Edit( { attributes, clientId, setAttributes } ) {
 												'core/paragraph',
 												{
 													className:
-														'wmf-pattern-overlay__category is-style-sans-p',
+														'hm-map-overlay__category is-style-sans-p',
 													content:
 														'<strong>Lorem ipsum / Sit amet</strong>',
 													style: {
@@ -618,7 +618,7 @@ export default function Edit( { attributes, clientId, setAttributes } ) {
 												'core/heading',
 												{
 													className:
-														'wmf-pattern-overlay__heading is-style-h2',
+														'hm-map-overlay__heading is-style-h2',
 													content:
 														'<strong>Lorem ipsum dolor sit amet imperdiet</strong>',
 													level: 4,
@@ -628,7 +628,7 @@ export default function Edit( { attributes, clientId, setAttributes } ) {
 												'core/paragraph',
 												{
 													className:
-														'wmf-pattern-overlay__location is-style-sans-p',
+														'hm-map-overlay__location is-style-sans-p',
 													content:
 														'<em>Optional line for location</em>',
 												},
@@ -638,12 +638,12 @@ export default function Edit( { attributes, clientId, setAttributes } ) {
 												{
 													aspectRatio: '4/3',
 													className:
-														'is-style-default wmf-pattern-overlay__image',
+														'is-style-default hm-map-overlay__image',
 													id: 74197,
 													lightbox: {
 														aspectRatio: '4/3',
 														className:
-															'is-style-default wmf-pattern-overlay__image',
+															'is-style-default hm-map-overlay__image',
 														enabled: false,
 														id: 74197,
 														linkDestination: 'none',

@@ -1,4 +1,4 @@
-/* global wmf:false */
+/* global hmMap:false */
 import { __ } from '@wordpress/i18n';
 import { createBlock } from '@wordpress/blocks';
 import {
@@ -97,7 +97,7 @@ const MapPreview = ( {
 	 * Init the map.
 	 */
 	useEffect( () => {
-		if ( ! wmf?.apiKey || ! mapboxgl ) {
+		if ( ! hmMap?.apiKey || ! mapboxgl ) {
 			// eslint-disable-next-line no-console
 			console.error(
 				'Unable to initialize mapbox. API key or mapbox global unavailable.'
@@ -117,7 +117,7 @@ const MapPreview = ( {
 			// warnings when re-rendering.
 			containerRef.current.innerHTML = '';
 		}
-		mapboxgl.accessToken = wmf.apiKey;
+		mapboxgl.accessToken = hmMap.apiKey;
 		map = new mapboxgl.Map( {
 			container: 'map',
 			center: [ longitude || 0, latitude || 0 ],
@@ -305,7 +305,7 @@ const Edit = ( {
 			return;
 		}
 
-		const created = createBlock( 'wmf-reports/marker', {
+		const created = createBlock( 'hm/map-marker', {
 			id: Date.now(),
 			title: `Marker ${ slideCount.current + 1 }`,
 			lat: center.lat,
@@ -489,13 +489,13 @@ const Edit = ( {
 	} );
 
 	// eslint-disable-next-line no-undef
-	if ( ! wmf.apiKey ) {
+	if ( ! hmMap.apiKey ) {
 		return (
 			<div className="components-placeholder is-large">
 				<div className="components-placeholder__fieldset">
 					{ __(
 						'Map not available, please ensure you have entered the map API key.',
-						'wmf-reports'
+						'hm-map-block'
 					) }
 				</div>
 			</div>
@@ -515,7 +515,7 @@ const Edit = ( {
 			} }
 		>
 			<PaletteColorPicker
-				label={ __( 'Active Marker', 'wmf-reports' ) }
+				label={ __( 'Active Marker', 'hm-map-block' ) }
 				color={
 					markerActiveColor?.color || attributes.markerActiveColor
 				}
@@ -525,10 +525,10 @@ const Edit = ( {
 			<InspectorControls>
 				<PanelBody>
 					<SelectControl
-						label={ __( 'Select Mapbox style', 'wmf-reports' ) }
+						label={ __( 'Select Mapbox style', 'hm-map-block' ) }
 						help={ __(
 							'Change the style associated with the map',
-							'wmf-reports'
+							'hm-map-block'
 						) }
 						options={ mapboxStyleOptions }
 						// eslint-disable-next-line no-shadow
@@ -539,7 +539,7 @@ const Edit = ( {
 					/>
 					{ customStyleSelected ? (
 						<TextControl
-							label={ __( 'Custom style', 'wmf-reports' ) }
+							label={ __( 'Custom style', 'hm-map-block' ) }
 							value={ mapStyle }
 							// eslint-disable-next-line no-shadow
 							onChange={ ( mapStyle ) => {
@@ -548,7 +548,7 @@ const Edit = ( {
 						/>
 					) : null }
 					<SelectControl
-						label={ __( 'Choose projection', 'wmf-reports' ) }
+						label={ __( 'Choose projection', 'hm-map-block' ) }
 						options={ [
 							{
 								value: 'equirectangular',
@@ -562,7 +562,7 @@ const Edit = ( {
 						}
 					/>
 					<NumberControl
-						label={ __( 'Center point latitude', 'wmf-reports' ) }
+						label={ __( 'Center point latitude', 'hm-map-block' ) }
 						value={ attributes.centerLat }
 						onChange={ ( centerLat ) =>
 							setAttributes( {
@@ -571,7 +571,7 @@ const Edit = ( {
 						}
 					/>
 					<NumberControl
-						label={ __( 'Center point longitude', 'wmf-reports' ) }
+						label={ __( 'Center point longitude', 'hm-map-block' ) }
 						value={ attributes.centerLon }
 						onChange={ ( centerLon ) =>
 							setAttributes( {
@@ -580,7 +580,7 @@ const Edit = ( {
 						}
 					/>
 					<NumberControl
-						label={ __( 'Initial zoom level', 'wmf-reports' ) }
+						label={ __( 'Initial zoom level', 'hm-map-block' ) }
 						value={ attributes.zoom }
 						onChange={ ( zoom ) =>
 							setAttributes( { zoom: parseFloat( zoom ) } )
@@ -597,16 +597,16 @@ const Edit = ( {
 			/>
 			<div className="inner-block-slider">
 				<InnerBlocksDisplaySingle
-					allowedBlocks={ [ 'wmf-reports/marker' ] }
+					allowedBlocks={ [ 'hm/map-marker' ] }
 					className="slides"
 					currentItemIndex={ currentItemIndex }
 					parentBlockId={ clientId }
-					template={ [ [ 'wmf-reports/marker' ] ] }
+					template={ [ [ 'hm/map-marker' ] ] }
 				/>
 				<p className="help">
 					{ __(
 						'Click on the + below to add a marker. Position the marker by dragging or enter its coordinates',
-						'wmf-reports'
+						'hm-map-block'
 					) }
 				</p>
 				<Navigation

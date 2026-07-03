@@ -12,9 +12,7 @@ function bootstrap() : void {
 	add_action( 'init', __NAMESPACE__ . '\\register_blocks' );
 
 	Assets\bootstrap();
-	// Settings page for the Mapbox API key. Namespace pending rename from
-	// the original annual report plugin source.
-	\WMF\Reports\Blocks\Map\bootstrap();
+	Settings\bootstrap();
 }
 
 /**

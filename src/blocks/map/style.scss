@@ -1,6 +1,6 @@
 @use "../../helpers/variables";
 
-.wp-block-wmf-reports-map {
+.wp-block-hm-map {
 	display: grid;
 	grid-template-rows: auto auto;
 	grid-template-columns: 1fr;
@@ -69,7 +69,7 @@
 }
 
 /* Vertically stacked (default) style. */
-.wp-block-wmf-reports-map:not(.is-style-side-by-side) {
+.wp-block-hm-map:not(.is-style-side-by-side) {
 	#map {
 		background-color: #fff;
 	}
@@ -113,13 +113,13 @@
 	}
 }
 
-.wp-block-wmf-reports-map__container.wp-block-group.has-background:not(
+.wp-block-hm-map__container.wp-block-group.has-background:not(
 		:only-child
 	) {
 	padding-bottom: 0 !important;
 }
 
-.wp-block-wmf-reports-marker {
+.wp-block-hm-map-marker {
 	&.animate {
 		transition: all 0.25s;
 	}
@@ -138,14 +138,14 @@
 // These general non-layout styles are sandboxed to the side-by-side mode
 // as of July 2025. They could be expanded to apply to all maps if it is
 // acceptable to retroactively change design on e.g. old annual reports.
-.wp-block-wmf-reports-map.is-style-side-by-side {
+.wp-block-hm-map.is-style-side-by-side {
 	.marker.active {
 		outline: 4px solid white;
 		outline-offset: -6px;
 	}
 
 	// These controls aren't accessible on the <p> block yet.
-	.wmf-pattern-reports-carousel-slide__location {
+	.hm-map-slide__location {
 		font-weight: bold;
 		font-style: italic;
 		margin-bottom: 1rem;
@@ -157,7 +157,7 @@
 	}
 }
 
-.wp-block-wmf-reports-map.is-style-side-by-side {
+.wp-block-hm-map.is-style-side-by-side {
 	@media screen and (max-width: 719px /* 45rem - 1px */) {
 		.is-layout-constrained > &:not(.alignfull) {
 			// Always full-bleed on small viewports. Override core style.
@@ -193,7 +193,7 @@
 			}
 		}
 
-		.wmf-pattern-reports-carousel-slide {
+		.hm-map-slide {
 			> .wp-block-columns {
 				display: flex;
 				flex-direction: column;
@@ -229,7 +229,7 @@
 		padding-bottom: 4rem;
 	}
 
-	.wp-block-wmf-reports-marker {
+	.wp-block-hm-map-marker {
 		grid-column: 1;
 		grid-row: 1;
 		margin: 0;
@@ -254,9 +254,9 @@
 	}
 
 	// Avoid CLS when loading in. May be better to switch to a .nojs class?
-	&.carousel--uninitialized .wp-block-wmf-reports-marker:not(:first-of-type),
+	&.carousel--uninitialized .wp-block-hm-map-marker:not(:first-of-type),
 	// But we also need to guard against flash of content *while initializing*.
-	.carousel__carousel-wrapper:not(:has(> [style])) .wp-block-wmf-reports-marker:not(:first-child) {
+	.carousel__carousel-wrapper:not(:has(> [style])) .wp-block-hm-map-marker:not(:first-child) {
 		display: none;
 	}
 

@@ -9,7 +9,7 @@
 
 namespace HM\MapBlock\Assets;
 
-use const WMF\Reports\Blocks\Map\MAP_API_OPTION_KEY;
+use const HM\MapBlock\Settings\MAP_API_OPTION_KEY;
 
 const MAPBOX_GL_VERSION = '3.2.0';
 
@@ -68,7 +68,7 @@ function register_mapbox_assets() : void {
  * Enqueue the Mapbox stylesheet wherever the map renders (frontend + editor).
  */
 function enqueue_mapbox_styles() : void {
-	if ( is_admin() || has_block( 'wmf-reports/map' ) ) {
+	if ( is_admin() || has_block( 'hm/map' ) ) {
 		wp_enqueue_style( 'mapbox-gl' );
 	}
 }
@@ -82,10 +82,10 @@ function localize_editor_config() : void {
 		'theme'  => get_option( 'stylesheet' ),
 	];
 
-	foreach ( [ 'wmf-reports/map', 'wmf-reports/marker' ] as $block_name ) {
+	foreach ( [ 'hm/map', 'hm/map-marker' ] as $block_name ) {
 		wp_localize_script(
 			generate_block_asset_handle( $block_name, 'editorScript' ),
-			'wmf',
+			'hmMap',
 			$config
 		);
 	}
@@ -95,13 +95,13 @@ function localize_editor_config() : void {
  * Expose the API key to the frontend view script.
  */
 function localize_frontend_config() : void {
-	if ( ! has_block( 'wmf-reports/map' ) ) {
+	if ( ! has_block( 'hm/map' ) ) {
 		return;
 	}
 
 	wp_localize_script(
-		generate_block_asset_handle( 'wmf-reports/map', 'viewScript' ),
-		'wmf',
+		generate_block_asset_handle( 'hm/map', 'viewScript' ),
+		'hmMap',
 		[ 'apiKey' => get_api_key() ]
 	);
 }

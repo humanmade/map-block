@@ -25,6 +25,6 @@ const PLUGIN_PATH    = __DIR__;
 
 require_once __DIR__ . '/inc/namespace.php';
 require_once __DIR__ . '/inc/assets.php';
-require_once __DIR__ . '/inc/blocks/map.php';
+require_once __DIR__ . '/inc/settings.php';
 
 bootstrap();
