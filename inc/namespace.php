@@ -13,6 +13,8 @@ function bootstrap(): void {
 
 	Assets\bootstrap();
 	Settings\bootstrap();
+	Compat\bootstrap();
+	CLI\bootstrap();
 }
 
 /**

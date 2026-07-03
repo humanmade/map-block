@@ -41,6 +41,19 @@ The blocks work out of the box, but visual design is intentionally left to the i
 - **JS events**: the block wrapper dispatches `hm-map:ready` (detail: `{ map }`) and `hm-map:pin-activate` (detail: `{ index }`) CustomEvents for site code to hook into.
 - **Content Security Policy**: if your site sends a CSP, allow `https://api.mapbox.com` in `script-src`/`style-src`, `https://api.mapbox.com https://events.mapbox.com` in `connect-src`, and `blob:` in `worker-src` (Mapbox GL uses web workers).
 
+## Migrating from the annual report plugin
+
+Content authored with `wmf-reports/map` and `wmf-reports/marker` keeps rendering on the frontend: the legacy block names are registered against the current render templates (editor support is not provided for the legacy names).
+
+To migrate stored content to the new format, run:
+
+```
+wp hm-map migrate --dry-run   # report what would change
+wp hm-map migrate             # rewrite block names, slide classes, and copy the API key option
+```
+
+The command rewrites the block delimiters, renames the `wmf-pattern-reports-carousel-slide` class to `hm-map-slide`, and copies the `wmf-map-api-key` option to `hm_map_api_key` if unset. `wmf-reports/overlay` blocks (a separate feature of the source plugin) are left untouched. Note the default map style is now Mapbox Light rather than Wikimedia's custom style; set a Custom style URI on migrated maps if the old look is required.
+
 ## Development
 
 ### Build commands

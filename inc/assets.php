@@ -69,7 +69,8 @@ function register_mapbox_assets(): void {
  * Enqueue the Mapbox stylesheet wherever the map renders (frontend + editor).
  */
 function enqueue_mapbox_styles(): void {
-	if ( is_admin() || has_block( 'hm/map' ) ) {
+	// The legacy name covers content not yet migrated (see inc/compat.php).
+	if ( is_admin() || has_block( 'hm/map' ) || has_block( 'wmf-reports/map' ) ) {
 		wp_enqueue_style( 'mapbox-gl' );
 	}
 }
@@ -96,7 +97,7 @@ function localize_editor_config(): void {
  * Expose the API key to the frontend view script.
  */
 function localize_frontend_config(): void {
-	if ( ! has_block( 'hm/map' ) ) {
+	if ( ! has_block( 'hm/map' ) && ! has_block( 'wmf-reports/map' ) ) {
 		return;
 	}
 
