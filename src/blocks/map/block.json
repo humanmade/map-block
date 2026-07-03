@@ -1,0 +1,55 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "wmf-reports/map",
+	"version": "0.1.0",
+	"title": "Map",
+	"category": "widgets",
+	"icon": "admin-site",
+	"description": "",
+	"attributes": {
+		"align": {
+			"type": "string",
+			"default": "full"
+		},
+		"mapStyle": {
+			"type": "string",
+			"default": "mapbox://styles/mattwatsonhm/clu09j0hw00tf01p7dpw5hyv7"
+		},
+		"markerActiveColor": {
+			"type": "string"
+		},
+		"projection": {
+			"type": "string",
+			"default": "equirectangular"
+		},
+		"centerLat": {
+			"type": "number",
+			"default": 8.18
+		},
+		"centerLon": {
+			"type": "number",
+			"default": 9
+		},
+		"zoom": {
+			"type": "number",
+			"default": 0.5
+		}
+	},
+	"example": {},
+	"supports": {
+		"html": false,
+		"multiple": false,
+		"align": [ "full", "wide" ],
+		"color": {
+			"background": true,
+			"text": false
+		}
+	},
+	"textdomain": "wmf-reports",
+	"editorScript": "file:./index.js",
+	"editorStyle": "file:./index.css",
+	"render": "file:./render.php",
+	"style": "file:./style-index.css",
+	"viewScript": [ "file:./view.js", "mapbox-gl" ]
+}

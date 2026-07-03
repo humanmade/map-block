@@ -1,0 +1,46 @@
+.wp-block-wmf-reports-map .block-editor-block-list__layout > .wp-block[data-align="full"] {
+	max-width: 100%;
+
+	.wp-block:not([data-align="full"]) {
+		max-width: 960px;
+	}
+}
+
+.wp-block-wmf-reports-map {
+
+	.help {
+		color: #333;
+		font-size: 1rem;
+		margin-bottom: 0.5rem;
+		margin-top: -2rem;
+	}
+
+	&:not(:has(.wp-block-wmf-reports-marker)) {
+
+		.help {
+			margin-top: 0;
+		}
+	}
+
+	&.is-style-side-by-side {
+
+		> .inner-block-slider {
+			min-width: 250px;
+		}
+
+		.help {
+			color: inherit;
+			padding: 0.5rem;
+		}
+
+		.help,
+		.overlay-container {
+			margin: 0;
+		}
+
+		.wp-block-button.is-style-as-arrow-link,
+		.wp-block-button.is-style-as-arrow-link .wp-block-button__link {
+			color: inherit !important; // Overrides editor-styles-wrapper rule.
+		}
+	}
+}
