@@ -1,0 +1,34 @@
+{
+	"name": "hm-map-block",
+	"version": "0.1.0",
+	"description": "A Mapbox-backed map block with markers, carousel and tooltip display modes.",
+	"author": "Human Made",
+	"license": "GPL-2.0-or-later",
+	"scripts": {
+		"build": "wp-scripts build --webpack-copy-php",
+		"start": "wp-scripts start --webpack-copy-php",
+		"format": "wp-scripts format",
+		"lint:css": "wp-scripts lint-style",
+		"lint:js": "wp-scripts lint-js",
+		"lint:pkg-json": "wp-scripts lint-pkg-json",
+		"packages-update": "wp-scripts packages-update",
+		"plugin-zip": "wp-scripts plugin-zip",
+		"env:cli": "npx @wordpress/env run cli",
+		"env:db": "npx @wordpress/env run cli -- mysql -uroot -ppassword wordpress --host=mysql",
+		"env:destroy": "npx @wordpress/env destroy",
+		"env:logs": "npx @wordpress/env logs development | grep -v -E '\"(GET|OPTIONS|HEAD|POST|PUT)'",
+		"env:start": "npx @wordpress/env start",
+		"env:stop": "npx @wordpress/env stop"
+	},
+	"dependencies": {
+		"mapbox-gl": "^3.2.0"
+	},
+	"devDependencies": {
+		"@mapbox/search-js-react": "^1.0.0-beta.19",
+		"@wordpress/scripts": "^32.0.0",
+		"classnames": "^2.5.1",
+		"prop-types": "^15.8.1",
+		"react": "^18.3.1",
+		"react-dom": "^18.3.1"
+	}
+}

@@ -4,6 +4,12 @@
 node_modules/
 vendor/
 
+# CI-generated code.
+/build/
+
+# Local agent session state.
+/.claude/
+
 # Environment-specific
 .env
 
