@@ -1,5 +1,7 @@
 <?php
 /**
+ * Frontend render template for the map block.
+ *
  * @see https://github.com/WordPress/gutenberg/blob/trunk/docs/reference-guides/block-api/block-metadata.md#render
  */
 
@@ -42,7 +44,7 @@ $wrapper_attributes = get_block_wrapper_attributes( [
 		data-zoom="<?php echo esc_attr( $attributes['zoom'] ?? 1 ); ?>"
 	></div>
 	<div class="<?php echo esc_attr( $display_mode === 'tooltip' ? 'map__marker-content' : 'carousel__carousel-wrapper' ); ?>">
-		<?php echo $content; ?>
+		<?php echo $content; // phpcs:ignore HM.Security.EscapeOutput.OutputNotEscaped -- Inner block content is pre-rendered. ?>
 	</div>
 	<?php if ( $display_mode !== 'tooltip' && substr_count( $content, 'wp-block-hm-map-marker' ) > 1 ) : ?>
 	<div class="carousel-buttons">

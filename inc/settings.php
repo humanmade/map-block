@@ -1,7 +1,8 @@
 <?php
 /**
- * Block-specific PHP logic for the Map block.
+ * Settings page for storing the Mapbox API key.
  */
+
 declare( strict_types=1 );
 
 namespace HM\MapBlock\Settings;
@@ -23,7 +24,7 @@ function bootstrap() {
  *
  * @return void
  */
-function register_map_settings() : void {
+function register_map_settings(): void {
 	register_setting(
 		'hm_map_settings',
 		MAP_API_OPTION_KEY,
@@ -40,7 +41,7 @@ function register_map_settings() : void {
  *
  * @return void
  */
-function add_map_settings_page() : void {
+function add_map_settings_page(): void {
 	add_options_page(
 		esc_html__( 'Map Settings', 'hm-map-block' ),
 		esc_html__( 'Map Settings', 'hm-map-block' ),
@@ -53,29 +54,29 @@ function add_map_settings_page() : void {
 /**
  * Render the settings page.
  */
-function render_map_settings_admin_page() : void {
-?>
+function render_map_settings_admin_page(): void {
+	?>
 <div class="wrap">
-    <h1><?php esc_html_e( 'Map Settings', 'hm-map-block' ); ?></h1>
-    <p><?php esc_html_e( 'This admin screen lets you manage your map settings.', 'hm-map-block' ); ?></p>
+	<h1><?php esc_html_e( 'Map Settings', 'hm-map-block' ); ?></h1>
+	<p><?php esc_html_e( 'This admin screen lets you manage your map settings.', 'hm-map-block' ); ?></p>
 
-    <form method="post">
-        <?php
+	<form method="post">
+		<?php
 			$api_key = (string) get_option( MAP_API_OPTION_KEY, '' );
-			?>
+		?>
 
-        <h2 class="title"><?php esc_html_e( 'API Key', 'hm-map-block' ); ?></h2>
-        <p><?php esc_html_e( 'Use this section to manage your API Key.', 'hm-map-block' ); ?></p>
-        <table class="form-table permalink-structure" role="presentation">
-            <tbody>
-                <tr>
-                    <th scope="row">
-                        <label for="map_api_key"><?php esc_html_e( 'Mapbox API Key', 'hm-map-block' ); ?></label>
-                    </th>
-                    <td>
-                        <p>
-                            <input id="map_api_key" name="<?php echo esc_attr( MAP_API_OPTION_KEY ); ?>"
-                                type="text" value="<?php echo esc_attr( $api_key ); ?>" />
+		<h2 class="title"><?php esc_html_e( 'API Key', 'hm-map-block' ); ?></h2>
+		<p><?php esc_html_e( 'Use this section to manage your API Key.', 'hm-map-block' ); ?></p>
+		<table class="form-table permalink-structure" role="presentation">
+			<tbody>
+				<tr>
+					<th scope="row">
+						<label for="map_api_key"><?php esc_html_e( 'Mapbox API Key', 'hm-map-block' ); ?></label>
+					</th>
+					<td>
+						<p>
+							<input id="map_api_key" name="<?php echo esc_attr( MAP_API_OPTION_KEY ); ?>"
+								type="text" value="<?php echo esc_attr( $api_key ); ?>" />
 							<p class="description">
 								<?php
 								printf(
@@ -85,17 +86,17 @@ function render_map_settings_admin_page() : void {
 								)
 								?>
 							</p>
-                        </p>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
+						</p>
+					</td>
+				</tr>
+			</tbody>
+		</table>
 
-        <?php wp_nonce_field( MAP_SETTINGS_NONCE_ACTION ); ?>
-        <input type="submit" value="Save" class="button button-primary button-large">
-    </form>
+		<?php wp_nonce_field( MAP_SETTINGS_NONCE_ACTION ); ?>
+		<input type="submit" value="Save" class="button button-primary button-large">
+	</form>
 </div>
-<?php
+	<?php
 }
 
 /**
@@ -103,7 +104,7 @@ function render_map_settings_admin_page() : void {
  *
  * @return void
  */
-function save_map_settings_options() : void {
+function save_map_settings_options(): void {
 	// If the user cannot manage_options, bail.
 	if ( ! current_user_can( 'manage_options' ) ) {
 		return;
@@ -114,8 +115,7 @@ function save_map_settings_options() : void {
 		return;
 	}
 
-	// Default Sportsbook.
-	$api_key = sanitize_text_field( $_REQUEST[ MAP_API_OPTION_KEY ] );
+	$api_key = sanitize_text_field( wp_unslash( $_REQUEST[ MAP_API_OPTION_KEY ] ?? '' ) );
 	update_option( MAP_API_OPTION_KEY, $api_key );
 
 	// Add a notice so we know the option has been updated.
@@ -127,7 +127,7 @@ function save_map_settings_options() : void {
  *
  * @return void
  */
-function show_updated_notice() : void {
+function show_updated_notice(): void {
 	$class   = 'notice notice-success is-dismissible';
 	$message = esc_html__( 'Settings Saved.', 'hm-map-block' );
 

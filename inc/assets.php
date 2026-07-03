@@ -16,7 +16,7 @@ const MAPBOX_GL_VERSION = '3.2.0';
 /**
  * Attach hooks.
  */
-function bootstrap() : void {
+function bootstrap(): void {
 	add_action( 'init', __NAMESPACE__ . '\\register_mapbox_assets' );
 	add_action( 'enqueue_block_assets', __NAMESPACE__ . '\\enqueue_mapbox_styles' );
 	add_action( 'enqueue_block_editor_assets', __NAMESPACE__ . '\\localize_editor_config' );
@@ -28,7 +28,7 @@ function bootstrap() : void {
  *
  * @return string API key, or empty string if unconfigured.
  */
-function get_api_key() : string {
+function get_api_key(): string {
 	/**
 	 * Filter the Mapbox API key.
 	 *
@@ -37,6 +37,7 @@ function get_api_key() : string {
 	 *
 	 * @param string $api_key Key as stored in the site option.
 	 */
+	// phpcs:ignore WordPress.NamingConventions.ValidHookName.UseUnderscores -- Slashed hook names are HM convention.
 	return (string) apply_filters( 'hm/map/api_key', get_option( MAP_API_OPTION_KEY, '' ) );
 }
 
@@ -47,7 +48,7 @@ function get_api_key() : string {
  * bundling the library, so the block.json viewScript lists this handle
  * as a dependency.
  */
-function register_mapbox_assets() : void {
+function register_mapbox_assets(): void {
 	wp_register_script(
 		'mapbox-gl',
 		sprintf( 'https://api.mapbox.com/mapbox-gl-js/v%s/mapbox-gl.js', MAPBOX_GL_VERSION ),
@@ -67,7 +68,7 @@ function register_mapbox_assets() : void {
 /**
  * Enqueue the Mapbox stylesheet wherever the map renders (frontend + editor).
  */
-function enqueue_mapbox_styles() : void {
+function enqueue_mapbox_styles(): void {
 	if ( is_admin() || has_block( 'hm/map' ) ) {
 		wp_enqueue_style( 'mapbox-gl' );
 	}
@@ -76,7 +77,7 @@ function enqueue_mapbox_styles() : void {
 /**
  * Expose the API key to the map and marker editor scripts.
  */
-function localize_editor_config() : void {
+function localize_editor_config(): void {
 	$config = [
 		'apiKey' => get_api_key(),
 		'theme'  => get_option( 'stylesheet' ),
@@ -94,7 +95,7 @@ function localize_editor_config() : void {
 /**
  * Expose the API key to the frontend view script.
  */
-function localize_frontend_config() : void {
+function localize_frontend_config(): void {
 	if ( ! has_block( 'hm/map' ) ) {
 		return;
 	}
