@@ -121,11 +121,20 @@ const MapPreview = ( {
 		// warnings when re-rendering.
 		containerRef.current.innerHTML = '';
 
+		// The block canvas renders in an iframe, but this script (and its
+		// bundled mapbox-gl) runs in the parent window. Elements created by
+		// React inside the iframe belong to the iframe's realm and fail
+		// mapbox's `instanceof HTMLElement` check, and string IDs resolve
+		// against the parent document. Create the container in this realm and
+		// let DOM adoption move it into the iframe: the JS wrapper keeps its
+		// realm, so mapbox accepts it, while the node renders in the canvas.
+		const mapContainer = document.createElement( 'div' );
+		mapContainer.style.minHeight = '250px';
+		containerRef.current.appendChild( mapContainer );
+
 		mapboxgl.accessToken = hmMap.apiKey;
-		// Pass the element itself: a string ID would be resolved against the
-		// top-level document and fail inside the iframed post editor.
 		map = new mapboxgl.Map( {
-			container: containerRef.current,
+			container: mapContainer,
 			center: [ longitude || 0, latitude || 0 ],
 			minZoom: 0,
 			projection,
@@ -415,8 +424,12 @@ const Edit = ( {
 		}
 
 		const features = map.querySourceFeatures( 'markers' );
-		const mapMarkers = document.getElementsByClassName( 'marker' );
-		const clusterMarkers = document.getElementsByClassName( 'cluster' );
+		const mapMarkers = map
+			.getContainer()
+			.getElementsByClassName( 'marker' );
+		const clusterMarkers = map
+			.getContainer()
+			.getElementsByClassName( 'cluster' );
 		const newMarkers = [];
 		const newClusters = [];
 
