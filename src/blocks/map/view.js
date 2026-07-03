@@ -23,9 +23,7 @@ document.addEventListener( 'DOMContentLoaded', () => {
 	mapboxgl.accessToken = hmMap.apiKey;
 
 	const mapDiv = document.getElementById( 'map' );
-	const markers = document.getElementsByClassName(
-		'wp-block-hm-map-marker'
-	);
+	const markers = document.getElementsByClassName( 'wp-block-hm-map-marker' );
 	const backButton = document.getElementById( 'map-back' );
 	const forwardButton = document.getElementById( 'map-forward' );
 	const fullScreenControl = new mapboxgl.NavigationControl();
@@ -90,7 +88,7 @@ document.addEventListener( 'DOMContentLoaded', () => {
 				mapMarker.closest( '.wp-block-group[id]' )?.id || 'map';
 
 			if ( shouldScrollToElement && mapMarker.dataset.id ) {
-				location.hash = `${ groupID }-${ mapMarker.dataset.id }`;
+				window.location.hash = `${ groupID }-${ mapMarker.dataset.id }`;
 				scrollToSection( mapMarker );
 			}
 		} );
@@ -443,8 +441,8 @@ document.addEventListener( 'DOMContentLoaded', () => {
 
 		// Check for current slide on load, and advance to it if set.
 		// Otherwise, just initialize the map with the first item.
-		const slideID = location.hash.slice(
-			location.hash.lastIndexOf( '-' ) + 1
+		const slideID = window.location.hash.slice(
+			window.location.hash.lastIndexOf( '-' ) + 1
 		);
 		const slide = document.getElementById( slideID );
 		if ( slide && slide.closest( '.map.carousel' ) ) {

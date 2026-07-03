@@ -14,7 +14,7 @@ import { Button } from '@wordpress/components';
  * @param {boolean}  props.nextEnabled     Is Next button enabled.
  * @param {Function} props.addSlide        Add slide callback.
  * @param {boolean}  props.addSlideEnabled Is add slide button enabled.
- * @return {ReactNode} Component.
+ * @return {Element} Component.
  */
 function Navigation( {
 	totalPages,

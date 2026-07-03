@@ -4,7 +4,7 @@ const ADDITIONAL_MARGIN = 8; // 0.5rem, for comfort.
  * Check whether an element is fully visible within the window viewport.
  *
  * @param {HTMLElement} element
- * @return {bool} Whether the element is fully in-viewport.
+ * @return {boolean} Whether the element is fully in-viewport.
  */
 function isElementVisible( element ) {
 	const { top, bottom } = element.getBoundingClientRect();
@@ -16,7 +16,7 @@ function isElementVisible( element ) {
  * Variant of scrollIntoView( { block: 'start' } ) that accounts for the fixed header size.
  *
  * @param {HTMLElement} element      A DOM node to scroll into view.
- * @param {bool}        onlyIfNeeded Only perform the scroll if element is not already in view.
+ * @param {boolean}     onlyIfNeeded Only perform the scroll if element is not already in view.
  */
 export default function scrollToElement( element, onlyIfNeeded ) {
 	if ( onlyIfNeeded && isElementVisible( element ) ) {

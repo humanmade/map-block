@@ -8,6 +8,11 @@
 const wpScriptsConfig = require( '@wordpress/scripts/config/eslint.config.cjs' );
 
 module.exports = [
+	{
+		// reference/ holds large local-only checkouts (WordPress core, the
+		// original annual report plugin) and must never be linted.
+		ignores: [ 'reference/**', 'build/**', 'vendor/**' ],
+	},
 	...wpScriptsConfig,
 	{
 		settings: {
