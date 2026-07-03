@@ -74,9 +74,9 @@ $static_image = $render_mode === 'static' ? ( $attributes['staticImageUrl'] ?? '
 
 <div <?php echo wp_kses_data( $wrapper_attributes ); ?>>
 	<?php
-	// Mapbox wants an empty container, so avoid whitespace inside #map.
+	// Mapbox wants an empty container, so avoid whitespace inside the canvas.
 	printf(
-		'<div id="map" style="min-height: 250px"%s>%s</div>',
+		'<div class="map__canvas" style="min-height: 250px"%s>%s</div>',
 		$map_data_html, // phpcs:ignore HM.Security.EscapeOutput.OutputNotEscaped -- Escaped during assembly above.
 		empty( $static_image )
 			? ''
@@ -88,8 +88,8 @@ $static_image = $render_mode === 'static' ? ( $attributes['staticImageUrl'] ?? '
 	</div>
 	<?php if ( $display_mode !== 'tooltip' && substr_count( $content, 'wp-block-hm-map-marker' ) > 1 ) : ?>
 	<div class="carousel-buttons">
-		<button id="map-back" class="carousel__button carousel__button--back"><span class="screen-reader-text"><?php esc_html_e( 'Previous Map Marker', 'hm-map-block' ); ?></span></button>
-		<button id="map-forward" class="carousel__button carousel__button--forward"><span class="screen-reader-text"><?php esc_html_e( 'Next Map Marker', 'hm-map-block' ); ?></span></button>
+		<button class="carousel__button carousel__button--back"><span class="screen-reader-text"><?php esc_html_e( 'Previous Map Marker', 'hm-map-block' ); ?></span></button>
+		<button class="carousel__button carousel__button--forward"><span class="screen-reader-text"><?php esc_html_e( 'Next Map Marker', 'hm-map-block' ); ?></span></button>
 	</div>
 	<?php endif; ?>
 </div>

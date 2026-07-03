@@ -79,11 +79,15 @@ export function setupPins( {
 } ) {
 	/**
 	 * Sync HTML pin and cluster elements to the currently rendered features.
+	 *
+	 * Queries scope to this map's container so multiple map blocks on one
+	 * page manage their own pins independently.
 	 */
 	const updateMarkers = () => {
+		const container = map.getContainer();
 		const renderedFeatures = map.querySourceFeatures( 'markers' );
-		const mapMarkers = document.getElementsByClassName( 'marker' );
-		const clusterMarkers = document.getElementsByClassName( 'cluster' );
+		const mapMarkers = container.getElementsByClassName( 'marker' );
+		const clusterMarkers = container.getElementsByClassName( 'cluster' );
 		const newMarkers = [];
 		const newClusters = [];
 

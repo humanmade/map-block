@@ -114,14 +114,18 @@ const MapPreview = ( {
 			map.remove();
 		}
 
-		if ( containerRef.current ) {
-			// Clear out DIV to avoid "The map container element should be empty"
-			// warnings when re-rendering.
-			containerRef.current.innerHTML = '';
+		if ( ! containerRef.current ) {
+			return;
 		}
+		// Clear out DIV to avoid "The map container element should be empty"
+		// warnings when re-rendering.
+		containerRef.current.innerHTML = '';
+
 		mapboxgl.accessToken = hmMap.apiKey;
+		// Pass the element itself: a string ID would be resolved against the
+		// top-level document and fail inside the iframed post editor.
 		map = new mapboxgl.Map( {
-			container: 'map',
+			container: containerRef.current,
 			center: [ longitude || 0, latitude || 0 ],
 			minZoom: 0,
 			projection,
@@ -225,7 +229,7 @@ const MapPreview = ( {
 
 	return (
 		<div
-			id="map"
+			className="map__canvas"
 			style={ { minHeight: '250px' } }
 			ref={ containerRef }
 		></div>

@@ -4,21 +4,24 @@ import initCarousel from './frontend/carousel';
 import initTooltips from './frontend/tooltips';
 import initStaticMap from './frontend/static-map';
 
-window.hmMap = { ...window.hmMap, mapInitialized: false };
-document.addEventListener( 'DOMContentLoaded', () => {
-	// Avoid double-rendering in DevServer mode. Testing requires a full page reload.
-	if ( window.hmMap.mapInitialized ) {
+/**
+ * Initialize a single map block instance.
+ *
+ * @param {HTMLElement} wrapper Map block wrapper element.
+ */
+const initMapBlock = ( wrapper ) => {
+	// Avoid double-initialization (e.g. DevServer hot updates).
+	if ( wrapper.dataset.hmMapInitialized ) {
 		return;
 	}
-	window.hmMap.mapInitialized = true;
+	wrapper.dataset.hmMapInitialized = 'true';
 
-	const mapDiv = document.getElementById( 'map' );
+	const mapDiv = wrapper.querySelector( '.map__canvas' );
 	if ( ! mapDiv ) {
 		return;
 	}
 
-	const wrapper = mapDiv.closest( '.wp-block-hm-map' );
-	const markers = document.getElementsByClassName( 'wp-block-hm-map-marker' );
+	const markers = wrapper.getElementsByClassName( 'wp-block-hm-map-marker' );
 	const numberedPins = mapDiv.dataset.numberedPins === 'true';
 
 	// Static render mode positions pins over background artwork and needs
@@ -59,6 +62,10 @@ document.addEventListener( 'DOMContentLoaded', () => {
 	wrapper.dispatchEvent(
 		new CustomEvent( 'hm-map:ready', { detail: { map } } )
 	);
+};
+
+document.addEventListener( 'DOMContentLoaded', () => {
+	document.querySelectorAll( '.wp-block-hm-map' ).forEach( initMapBlock );
 } );
 
 if ( module.hot ) {

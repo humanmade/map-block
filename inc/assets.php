@@ -18,9 +18,12 @@ const MAPBOX_GL_VERSION = '3.2.0';
  */
 function bootstrap(): void {
 	add_action( 'init', __NAMESPACE__ . '\\register_mapbox_assets' );
-	add_action( 'enqueue_block_assets', __NAMESPACE__ . '\\enqueue_mapbox_styles' );
+	add_action( 'enqueue_block_assets', __NAMESPACE__ . '\\enqueue_editor_mapbox_styles' );
 	add_action( 'enqueue_block_editor_assets', __NAMESPACE__ . '\\localize_editor_config' );
-	add_action( 'wp_enqueue_scripts', __NAMESPACE__ . '\\localize_frontend_config', 20 );
+	// Enqueue frontend assets when a map actually renders: has_block() based
+	// checks miss archive and home views which render many posts.
+	add_filter( 'render_block_hm/map', __NAMESPACE__ . '\\enqueue_frontend_assets', 10, 2 );
+	add_filter( 'render_block_wmf-reports/map', __NAMESPACE__ . '\\enqueue_frontend_assets', 10, 2 );
 }
 
 /**
@@ -66,13 +69,43 @@ function register_mapbox_assets(): void {
 }
 
 /**
- * Enqueue the Mapbox stylesheet wherever the map renders (frontend + editor).
+ * Enqueue the Mapbox stylesheet in the editor, where the preview may render.
  */
-function enqueue_mapbox_styles(): void {
-	// The legacy name covers content not yet migrated (see inc/compat.php).
-	if ( is_admin() || has_block( 'hm/map' ) || has_block( 'wmf-reports/map' ) ) {
+function enqueue_editor_mapbox_styles(): void {
+	if ( is_admin() ) {
 		wp_enqueue_style( 'mapbox-gl' );
 	}
+}
+
+/**
+ * Enqueue Mapbox styles and localize the API key when a map block renders.
+ *
+ * Runs on the render_block filter for both current and legacy block names,
+ * which fires before footer scripts print regardless of the query type.
+ *
+ * @param string $block_content Rendered block markup.
+ * @param array  $block         Parsed block, including attributes.
+ * @return string Unmodified block markup.
+ */
+function enqueue_frontend_assets( string $block_content, array $block ): string {
+	// Static render mode uses neither the Mapbox library nor the API key.
+	if ( ( $block['attrs']['renderMode'] ?? 'interactive' ) === 'static' ) {
+		return $block_content;
+	}
+
+	wp_enqueue_style( 'mapbox-gl' );
+
+	static $localized = false;
+	if ( ! $localized ) {
+		$localized = true;
+		wp_localize_script(
+			generate_block_asset_handle( 'hm/map', 'viewScript' ),
+			'hmMap',
+			[ 'apiKey' => get_api_key() ]
+		);
+	}
+
+	return $block_content;
 }
 
 /**
@@ -91,19 +124,4 @@ function localize_editor_config(): void {
 			$config
 		);
 	}
-}
-
-/**
- * Expose the API key to the frontend view script.
- */
-function localize_frontend_config(): void {
-	if ( ! has_block( 'hm/map' ) && ! has_block( 'wmf-reports/map' ) ) {
-		return;
-	}
-
-	wp_localize_script(
-		generate_block_asset_handle( 'hm/map', 'viewScript' ),
-		'hmMap',
-		[ 'apiKey' => get_api_key() ]
-	);
 }

@@ -15,8 +15,8 @@ import { setupPins, markersToFeatures } from './create-map';
  * @param {HTMLCollection} options.markers  Marker block elements.
  */
 export default function initCarousel( { map, mapboxgl, wrapper, markers } ) {
-	const backButton = document.getElementById( 'map-back' );
-	const forwardButton = document.getElementById( 'map-forward' );
+	const backButton = wrapper.querySelector( '.carousel__button--back' );
+	const forwardButton = wrapper.querySelector( '.carousel__button--forward' );
 	let processingAnimation = false;
 
 	const scrollToSection = ( elt ) => {
@@ -32,12 +32,14 @@ export default function initCarousel( { map, mapboxgl, wrapper, markers } ) {
 
 	const setMarker = ( id, shouldScrollToElement = true ) => {
 		const nextMarkerInfoBox = markers[ id ];
-		const mapMarkers = document.getElementsByClassName( 'marker' );
+		const mapMarkers = map
+			.getContainer()
+			.getElementsByClassName( 'marker' );
 		const nextMapMarkers = Array.from( mapMarkers ).filter(
 			( mapMarker ) => mapMarker.dataset.id === nextMarkerInfoBox.id
 		);
 
-		const currentSlide = document.querySelector(
+		const currentSlide = wrapper.querySelector(
 			'.wp-block-hm-map-marker[style*="visibility: visible"]'
 		);
 		let currentId = 0;
@@ -236,7 +238,7 @@ export default function initCarousel( { map, mapboxgl, wrapper, markers } ) {
 				window.location.hash.lastIndexOf( '-' ) + 1
 			);
 			const slide = document.getElementById( slideID );
-			if ( slide && slide.closest( '.map.carousel' ) ) {
+			if ( slide && wrapper.contains( slide ) ) {
 				const slideIndex = [
 					...slide.parentElement.children,
 				].findIndex( ( { id } ) => id === slideID );
