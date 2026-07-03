@@ -162,7 +162,10 @@ export function setupPins( {
 						markerDiv.classList.add( 'active' );
 					}
 
-					markerDiv.addEventListener( 'click', () => {
+					markerDiv.addEventListener( 'click', ( event ) => {
+						// Don't let the click reach the map canvas, where it
+						// would immediately close a just-opened popup.
+						event.stopPropagation();
 						onPinClick( index, feature, markerDiv );
 					} );
 				}

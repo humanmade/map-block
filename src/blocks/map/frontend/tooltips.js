@@ -24,6 +24,10 @@ export default function initTooltips( {
 	const popup = new mapboxgl.Popup( {
 		className: 'hm-map-popup',
 		closeButton: true,
+		// A real mouse click on a pin reaches the map's own click pipeline
+		// regardless of DOM propagation, which would immediately re-close the
+		// popup; close via the button or by activating another pin instead.
+		closeOnClick: false,
 		maxWidth: 'none',
 	} );
 
@@ -44,11 +48,6 @@ export default function initTooltips( {
 				return;
 			}
 
-			Array.from( document.getElementsByClassName( 'marker' ) ).forEach(
-				( pin ) => pin.classList.remove( 'active' )
-			);
-			pinEl.classList.add( 'active' );
-
 			// Clone so the source content (used by the mobile list view, and
 			// re-used on subsequent opens) is left in place.
 			const content = document.createElement( 'div' );
@@ -59,10 +58,13 @@ export default function initTooltips( {
 				)
 			);
 
+			// Re-adding an open popup fires its close event synchronously
+			// (which clears pin active states), so highlight the pin after.
 			popup
 				.setLngLat( feature.geometry.coordinates )
 				.setDOMContent( content )
 				.addTo( map );
+			pinEl.classList.add( 'active' );
 
 			wrapper.dispatchEvent(
 				new CustomEvent( 'hm-map:pin-activate', {
