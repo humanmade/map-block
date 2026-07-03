@@ -1,1 +1,12 @@
 /reference/
+
+# Dependencies
+node_modules/
+vendor/
+
+# Environment-specific
+.env
+
+# Platform
+.DS_Store
+._*
