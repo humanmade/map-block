@@ -73,11 +73,16 @@ $static_image = $render_mode === 'static' ? ( $attributes['staticImageUrl'] ?? '
 ?>
 
 <div <?php echo wp_kses_data( $wrapper_attributes ); ?>>
-	<div id="map" style="min-height: 250px"<?php echo $map_data_html; // phpcs:ignore HM.Security.EscapeOutput.OutputNotEscaped -- Escaped during assembly above. ?>>
-		<?php if ( ! empty( $static_image ) ) : ?>
-		<img class="map__static-image" src="<?php echo esc_url( $static_image ); ?>" alt="" />
-		<?php endif; ?>
-	</div>
+	<?php
+	// Mapbox wants an empty container, so avoid whitespace inside #map.
+	printf(
+		'<div id="map" style="min-height: 250px"%s>%s</div>',
+		$map_data_html, // phpcs:ignore HM.Security.EscapeOutput.OutputNotEscaped -- Escaped during assembly above.
+		empty( $static_image )
+			? ''
+			: sprintf( '<img class="map__static-image" src="%s" alt="" />', esc_url( $static_image ) )
+	);
+	?>
 	<div class="<?php echo esc_attr( $display_mode === 'tooltip' ? 'map__marker-content' : 'carousel__carousel-wrapper' ); ?>">
 		<?php echo $content; // phpcs:ignore HM.Security.EscapeOutput.OutputNotEscaped -- Inner block content is pre-rendered. ?>
 	</div>

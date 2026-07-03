@@ -241,6 +241,11 @@ export function setupPins( {
 			updateMarkers();
 		} );
 
+		// The render burst can finish before the marker source loads on a
+		// quiet page; idle fires once everything has settled and guarantees
+		// the initial pin sync.
+		map.on( 'idle', updateMarkers );
+
 		onLoad();
 	} );
 }
