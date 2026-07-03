@@ -12,6 +12,7 @@ import {
 	PanelBody,
 	TextControl,
 	SelectControl,
+	ToggleControl,
 } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useCallback, useEffect, useRef, useState } from '@wordpress/element';
@@ -236,6 +237,8 @@ const MapPreview = ( {
  * @param {Function} props.setAttributes        Set Block Attributes.
  * @param {Object}   props.markerActiveColor    Color object for the active marker.
  * @param {Function} props.setMarkerActiveColor Function to update the active marker color.
+ * @param {Object}   props.markerColor          Color object for inactive map pins.
+ * @param {Function} props.setMarkerColor       Function to update the pin color.
  * @see https://developer.wordpress.org/block-editor/reference-guides/block-api/block-edit-save/#edit
  *
  * @return {Element} Element to render.
@@ -246,8 +249,12 @@ const Edit = ( {
 	setAttributes,
 	markerActiveColor,
 	setMarkerActiveColor,
+	markerColor,
+	setMarkerColor,
 } ) => {
-	const { mapStyle } = attributes;
+	const { displayMode, mapStyle, mobileBehavior, numberedPins } = attributes;
+	const isTooltipMode = displayMode === 'tooltip';
+	const showPinNumbers = isTooltipMode && numberedPins;
 
 	// Get the innerBlocks (slideBlocks).
 	const slideBlocks = useSelect(
@@ -401,6 +408,9 @@ const Edit = ( {
 					const markerDiv = document.createElement( 'div' );
 					markerDiv.className = 'marker';
 					markerDiv.dataset.id = id;
+					markerDiv.innerHTML = showPinNumbers
+						? `${ index + 1 }`
+						: '';
 
 					const pin = new mapboxgl.Marker( markerDiv )
 						.setDraggable( true )
@@ -459,7 +469,7 @@ const Edit = ( {
 				clusterMarker.remove();
 			}
 		} );
-	}, [ selectBlock, updateBlockAttributes ] );
+	}, [ selectBlock, showPinNumbers, updateBlockAttributes ] );
 
 	/**
 	 * If a slide is added, switch to the new slide. If one is deleted, make sure we don't
@@ -481,7 +491,9 @@ const Edit = ( {
 	}, [ slideBlocks.length, currentItemIndex, slideCount, slideBlocks ] );
 
 	const blockProps = useBlockProps( {
-		className: 'map map--carousel carousel',
+		className: isTooltipMode
+			? 'map map--tooltips'
+			: 'map map--carousel carousel',
 	} );
 
 	if ( ! hmMap.apiKey ) {
@@ -505,12 +517,20 @@ const Edit = ( {
 		<div
 			{ ...blockProps }
 			style={ {
-				'--map-marker-active-color':
+				'--hm-map-marker-active-color':
 					markerActiveColor?.color || attributes.markerActiveColor,
+				'--hm-map-pin-color':
+					markerColor?.color || attributes.markerColor,
 			} }
 		>
 			<PaletteColorPicker
-				label={ __( 'Active Marker', 'hm-map-block' ) }
+				label={ __( 'Map Pin', 'hm-map-block' ) }
+				color={ markerColor?.color || attributes.markerColor }
+				onColorChange={ setMarkerColor }
+				clientId={ clientId }
+			/>
+			<PaletteColorPicker
+				label={ __( 'Active Map Pin', 'hm-map-block' ) }
 				color={
 					markerActiveColor?.color || attributes.markerActiveColor
 				}
@@ -519,6 +539,81 @@ const Edit = ( {
 			/>
 			<InspectorControls>
 				<PanelBody>
+					<SelectControl
+						label={ __( 'Display mode', 'hm-map-block' ) }
+						help={
+							isTooltipMode
+								? __(
+										'Activating a pin opens a popup card within the map.',
+										'hm-map-block'
+								  )
+								: __(
+										'Activating a pin reveals slide content alongside or below the map.',
+										'hm-map-block'
+								  )
+						}
+						options={ [
+							{
+								label: __( 'Carousel', 'hm-map-block' ),
+								value: 'carousel',
+							},
+							{
+								label: __( 'In-map tooltips', 'hm-map-block' ),
+								value: 'tooltip',
+							},
+						] }
+						value={ displayMode }
+						onChange={ ( mode ) =>
+							setAttributes( { displayMode: mode } )
+						}
+					/>
+					{ isTooltipMode && (
+						<>
+							<ToggleControl
+								label={ __( 'Numbered pins', 'hm-map-block' ) }
+								help={ __(
+									'Label each pin with its marker number.',
+									'hm-map-block'
+								) }
+								checked={ numberedPins }
+								onChange={ ( value ) =>
+									setAttributes( { numberedPins: value } )
+								}
+							/>
+							<SelectControl
+								label={ __(
+									'Small screen behavior',
+									'hm-map-block'
+								) }
+								help={ __(
+									'"List markers below map" hides the pins on small screens and lists each marker’s content under the map instead.',
+									'hm-map-block'
+								) }
+								options={ [
+									{
+										label: __(
+											'Keep pins on the map',
+											'hm-map-block'
+										),
+										value: 'keep-pins',
+									},
+									{
+										label: __(
+											'List markers below map',
+											'hm-map-block'
+										),
+										value: 'list',
+									},
+								] }
+								value={ mobileBehavior }
+								onChange={ ( value ) =>
+									setAttributes( {
+										mobileBehavior: value,
+									} )
+								}
+							/>
+						</>
+					) }
 					<SelectControl
 						label={ __( 'Select Mapbox style', 'hm-map-block' ) }
 						help={ __(
@@ -622,4 +717,5 @@ const Edit = ( {
 
 export default withColors( {
 	markerActiveColor: 'active-marker-color',
+	markerColor: 'marker-color',
 } )( Edit );

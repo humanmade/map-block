@@ -20,7 +20,22 @@
 			"type": "string",
 			"default": "mapbox://styles/mapbox/light-v11"
 		},
+		"displayMode": {
+			"type": "string",
+			"default": "carousel"
+		},
+		"numberedPins": {
+			"type": "boolean",
+			"default": true
+		},
+		"mobileBehavior": {
+			"type": "string",
+			"default": "keep-pins"
+		},
 		"markerActiveColor": {
+			"type": "string"
+		},
+		"markerColor": {
 			"type": "string"
 		},
 		"projection": {
