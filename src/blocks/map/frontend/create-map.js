@@ -12,6 +12,9 @@
  * @return {Object} Mapbox GL Map instance.
  */
 export function createMap( mapboxgl, mapDiv ) {
+	const zoom = parseFloat( mapDiv.dataset.zoom || 1 );
+	const allowZoom = mapDiv.dataset.allowZoom !== 'false';
+
 	const map = new mapboxgl.Map( {
 		attributionControl: false,
 		container: mapDiv,
@@ -20,14 +23,21 @@ export function createMap( mapboxgl, mapDiv ) {
 			parseFloat( mapDiv.dataset.longitude || 0 ),
 			parseFloat( mapDiv.dataset.latitude || 0 ),
 		],
+		// Pinning min and max to the initial zoom locks every zoom
+		// interaction (buttons, gestures, keyboard) in one place.
+		minZoom: allowZoom ? parseFloat( mapDiv.dataset.minZoom || 0 ) : zoom,
+		maxZoom: allowZoom ? parseFloat( mapDiv.dataset.maxZoom || 22 ) : zoom,
+		doubleClickZoom: allowZoom,
 		projection: mapDiv.dataset.projection || 'equirectangular',
 		renderWorldCopies: false,
 		scrollZoom: false,
 		style: mapDiv.dataset.mapStyle || 'mapbox://styles/mapbox/light-v11',
-		zoom: parseFloat( mapDiv.dataset.zoom || 1 ),
+		zoom,
 	} );
 
-	map.addControl( new mapboxgl.NavigationControl() );
+	if ( allowZoom ) {
+		map.addControl( new mapboxgl.NavigationControl() );
+	}
 
 	return map;
 }

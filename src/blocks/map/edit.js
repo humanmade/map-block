@@ -67,6 +67,8 @@ const mapboxStyleOptions = [
  * @param {number}   props.latitude      Latitude of map centerpoint.
  * @param {number}   props.longitude     Longitude of map centerpoint.
  * @param {number}   props.zoom          Initial zoom level of map.
+ * @param {number}   props.minZoom       Minimum permitted zoom level.
+ * @param {number}   props.maxZoom       Maximum permitted zoom level.
  * @param {Object[]} props.slideBlocks   Block array, necessary for rerendering map.
  * @param {Function} props.updateMarkers Callback to update map pins.
  * @return {React.ReactNode} Container node for Map.
@@ -77,6 +79,8 @@ const MapPreview = ( {
 	latitude = 0,
 	longitude = 0,
 	zoom = 1,
+	minZoom = 0,
+	maxZoom = 22,
 	slideBlocks = [],
 	updateMarkers,
 } ) => {
@@ -229,12 +233,16 @@ const MapPreview = ( {
 
 	useEffect( () => {
 		if ( map ) {
-			// Keep the map up to date as attributes change.
+			// Keep the map up to date as attributes change. Zoom stays
+			// unlocked in the editor so authors can navigate while placing
+			// markers; the allowZoom lock is applied on the frontend.
 			map.setProjection( projection );
 			map.setCenter( [ longitude || 0, latitude || 0 ] );
+			map.setMinZoom( minZoom );
+			map.setMaxZoom( maxZoom );
 			map.setZoom( zoom || 1 );
 		}
-	}, [ projection, latitude, longitude, zoom ] );
+	}, [ projection, latitude, longitude, zoom, minZoom, maxZoom ] );
 
 	return (
 		<div
@@ -330,12 +338,15 @@ const Edit = ( {
 	setMarkerColor,
 } ) => {
 	const {
+		allowZoom,
 		boundsEast,
 		boundsNorth,
 		boundsSouth,
 		boundsWest,
 		displayMode,
 		mapStyle,
+		maxZoom,
+		minZoom,
 		mobileBehavior,
 		numberedPins,
 		renderMode,
@@ -826,6 +837,49 @@ const Edit = ( {
 									} )
 								}
 							/>
+							<ToggleControl
+								label={ __( 'Allow zooming', 'hm-map-block' ) }
+								help={ __(
+									'When disabled, visitors cannot change the zoom level and the zoom buttons are hidden. Zoom stays available within the editor.',
+									'hm-map-block'
+								) }
+								checked={ allowZoom }
+								onChange={ ( value ) =>
+									setAttributes( { allowZoom: value } )
+								}
+							/>
+							{ allowZoom && (
+								<>
+									<NumberControl
+										label={ __(
+											'Minimum zoom level',
+											'hm-map-block'
+										) }
+										min={ 0 }
+										max={ 22 }
+										value={ minZoom }
+										onChange={ ( value ) =>
+											setAttributes( {
+												minZoom: parseFloat( value ),
+											} )
+										}
+									/>
+									<NumberControl
+										label={ __(
+											'Maximum zoom level',
+											'hm-map-block'
+										) }
+										min={ 0 }
+										max={ 22 }
+										value={ maxZoom }
+										onChange={ ( value ) =>
+											setAttributes( {
+												maxZoom: parseFloat( value ),
+											} )
+										}
+									/>
+								</>
+							) }
 						</>
 					) }
 				</PanelBody>
@@ -948,6 +1002,8 @@ const Edit = ( {
 					latitude={ attributes.centerLat }
 					longitude={ attributes.centerLon }
 					zoom={ attributes.zoom }
+					minZoom={ minZoom }
+					maxZoom={ maxZoom }
 				/>
 			) }
 			<div className="inner-block-slider">

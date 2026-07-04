@@ -77,6 +77,18 @@
 		"zoom": {
 			"type": "number",
 			"default": 0.5
+		},
+		"allowZoom": {
+			"type": "boolean",
+			"default": true
+		},
+		"minZoom": {
+			"type": "number",
+			"default": 0
+		},
+		"maxZoom": {
+			"type": "number",
+			"default": 22
 		}
 	},
 	"example": {},

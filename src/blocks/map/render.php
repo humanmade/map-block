@@ -57,10 +57,13 @@ if ( $render_mode === 'static' ) {
 	] );
 } else {
 	$map_data_attributes = array_merge( $map_data_attributes, [
-		'data-map-style' => $map_style,
-		'data-latitude'  => (string) ( $attributes['centerLat'] ?? 0 ),
-		'data-longitude' => (string) ( $attributes['centerLon'] ?? 0 ),
-		'data-zoom'      => (string) ( $attributes['zoom'] ?? 1 ),
+		'data-map-style'  => $map_style,
+		'data-latitude'   => (string) ( $attributes['centerLat'] ?? 0 ),
+		'data-longitude'  => (string) ( $attributes['centerLon'] ?? 0 ),
+		'data-zoom'       => (string) ( $attributes['zoom'] ?? 1 ),
+		'data-allow-zoom' => ( $attributes['allowZoom'] ?? true ) ? 'true' : 'false',
+		'data-min-zoom'   => (string) ( $attributes['minZoom'] ?? 0 ),
+		'data-max-zoom'   => (string) ( $attributes['maxZoom'] ?? 22 ),
 	] );
 }
 

@@ -11,7 +11,7 @@ Extracted and generalized from the map functionality we built for the Wikimedia 
 - **Two display modes**:
   - *Carousel*: activating a pin reveals that marker's content as a slide, with prev/next paging. Block styles for stacked (default) and side-by-side layouts.
   - *In-map tooltips*: numbered pins open a popup card anchored to the pin, with an optional small-screen behavior that hides pins and lists marker content below the map.
-- Projection, center, zoom, and Mapbox style (built-in list or any custom `mapbox://` style URI) controls
+- Projection, center, zoom, and Mapbox style (built-in list or any custom `mapbox://` style URI) controls, with optional zoom locking and min/max zoom bounds
 - Pin and active-pin colors from the theme palette
 
 ## Installation
