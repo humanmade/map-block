@@ -12,10 +12,6 @@
 		{ "name": "side-by-side", "label": "Side-by-side" }
 	],
 	"attributes": {
-		"align": {
-			"type": "string",
-			"default": "full"
-		},
 		"mapStyle": {
 			"type": "string",
 			"default": "mapbox://styles/mapbox/light-v11"
