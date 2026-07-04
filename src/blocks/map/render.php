@@ -73,13 +73,25 @@ foreach ( $map_data_attributes as $data_attribute => $data_value ) {
 }
 
 $static_image = $render_mode === 'static' ? ( $attributes['staticImageUrl'] ?? '' ) : '';
+
+// An explicit aspect ratio replaces the default fixed canvas heights.
+// Static mode ignores it: the artwork's own ratio drives the layout there.
+$aspect_ratio = $render_mode === 'static' ? '' : ( $attributes['aspectRatio'] ?? '' );
+$canvas_class = 'map__canvas';
+$canvas_style = 'min-height: 250px';
+if ( ! empty( $aspect_ratio ) && preg_match( '#^\d+\s*/\s*\d+$#', $aspect_ratio ) ) {
+	$canvas_class .= ' map__canvas--fixed-aspect';
+	$canvas_style  = 'aspect-ratio: ' . $aspect_ratio;
+}
 ?>
 
 <div <?php echo wp_kses_data( $wrapper_attributes ); ?>>
 	<?php
 	// Mapbox wants an empty container, so avoid whitespace inside the canvas.
 	printf(
-		'<div class="map__canvas" style="min-height: 250px"%s>%s</div>',
+		'<div class="%s" style="%s"%s>%s</div>',
+		esc_attr( $canvas_class ),
+		esc_attr( $canvas_style ),
 		$map_data_html, // phpcs:ignore HM.Security.EscapeOutput.OutputNotEscaped -- Escaped during assembly above.
 		empty( $static_image )
 			? ''

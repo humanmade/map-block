@@ -409,3 +409,12 @@
 		top: 0.25rem;
 	}
 }
+
+/* Fixed aspect ratio: the inline aspect-ratio style replaces the default
+   fixed canvas heights set per display mode above. */
+.wp-block-hm-map .map__canvas--fixed-aspect,
+.wp-block-hm-map .map__canvas--fixed-aspect.mapboxgl-map {
+	height: auto;
+	min-height: 0;
+	width: 100%;
+}

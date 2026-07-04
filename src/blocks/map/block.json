@@ -82,6 +82,10 @@
 			"type": "boolean",
 			"default": true
 		},
+		"aspectRatio": {
+			"type": "string",
+			"default": ""
+		},
 		"minZoom": {
 			"type": "number",
 			"default": 0

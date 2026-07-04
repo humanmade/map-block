@@ -58,6 +58,16 @@ const mapboxStyleOptions = [
 	{ label: 'Custom', value: '' },
 ];
 
+const aspectRatioOptions = [
+	{ label: 'Default heights', value: '' },
+	{ label: '21:9', value: '21/9' },
+	{ label: '2:1', value: '2/1' },
+	{ label: '16:9', value: '16/9' },
+	{ label: '3:2', value: '3/2' },
+	{ label: '4:3', value: '4/3' },
+	{ label: '1:1', value: '1/1' },
+];
+
 /**
  * Render a container and initialize the map within it.
  *
@@ -69,6 +79,7 @@ const mapboxStyleOptions = [
  * @param {number}   props.zoom          Initial zoom level of map.
  * @param {number}   props.minZoom       Minimum permitted zoom level.
  * @param {number}   props.maxZoom       Maximum permitted zoom level.
+ * @param {string}   props.aspectRatio   CSS aspect-ratio value, or empty for default heights.
  * @param {Object[]} props.slideBlocks   Block array, necessary for rerendering map.
  * @param {Function} props.updateMarkers Callback to update map pins.
  * @return {React.ReactNode} Container node for Map.
@@ -81,6 +92,7 @@ const MapPreview = ( {
 	zoom = 1,
 	minZoom = 0,
 	maxZoom = 22,
+	aspectRatio = '',
 	slideBlocks = [],
 	updateMarkers,
 } ) => {
@@ -244,10 +256,21 @@ const MapPreview = ( {
 		}
 	}, [ projection, latitude, longitude, zoom, minZoom, maxZoom ] );
 
+	useEffect( () => {
+		if ( map ) {
+			// Let the container adopt its new dimensions, then remeasure.
+			setTimeout( () => map.resize(), 50 );
+		}
+	}, [ aspectRatio ] );
+
 	return (
 		<div
-			className="map__canvas"
-			style={ { minHeight: '250px' } }
+			className={
+				aspectRatio
+					? 'map__canvas map__canvas--fixed-aspect'
+					: 'map__canvas'
+			}
+			style={ aspectRatio ? { aspectRatio } : { minHeight: '250px' } }
 			ref={ containerRef }
 		></div>
 	);
@@ -339,6 +362,7 @@ const Edit = ( {
 } ) => {
 	const {
 		allowZoom,
+		aspectRatio,
 		boundsEast,
 		boundsNorth,
 		boundsSouth,
@@ -880,6 +904,18 @@ const Edit = ( {
 									/>
 								</>
 							) }
+							<SelectControl
+								label={ __( 'Aspect ratio', 'hm-map-block' ) }
+								help={ __(
+									'Lock the map canvas to a fixed aspect ratio instead of the default per-layout heights.',
+									'hm-map-block'
+								) }
+								options={ aspectRatioOptions }
+								value={ aspectRatio }
+								onChange={ ( value ) =>
+									setAttributes( { aspectRatio: value } )
+								}
+							/>
 						</>
 					) }
 				</PanelBody>
@@ -1004,6 +1040,7 @@ const Edit = ( {
 					zoom={ attributes.zoom }
 					minZoom={ minZoom }
 					maxZoom={ maxZoom }
+					aspectRatio={ aspectRatio }
 				/>
 			) }
 			<div className="inner-block-slider">
