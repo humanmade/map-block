@@ -152,6 +152,9 @@ const MapPreview = ( {
 		map = new mapboxgl.Map( {
 			container: mapContainer,
 			center: [ longitude || 0, latitude || 0 ],
+			// Fast repeat clicks while selecting or placing pins should not
+			// zoom the canvas; zoom via the nav control instead.
+			doubleClickZoom: false,
 			minZoom: 0,
 			projection,
 			renderWorldCopies: false,

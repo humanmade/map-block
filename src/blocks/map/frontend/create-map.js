@@ -182,6 +182,12 @@ export function setupPins( {
 						event.stopPropagation();
 						onPinClick( index, feature, markerDiv );
 					} );
+
+					// A fast second click would otherwise reach mapbox's
+					// double-click-zoom handler and zoom the map.
+					markerDiv.addEventListener( 'dblclick', ( event ) =>
+						event.stopPropagation()
+					);
 				}
 
 				if ( ! newMarkers.includes( id ) ) {
