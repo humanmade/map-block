@@ -30,6 +30,14 @@
 		outline-offset: 2px;
 	}
 
+	.inner-block-slider__navigation {
+		align-items: center;
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.25rem;
+		margin-top: 0.5rem;
+	}
+
 	// Label above the marker card editing area.
 	.inner-block-slider__label {
 		color: #757575;

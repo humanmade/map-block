@@ -2,9 +2,15 @@ import classNames from 'classnames';
 import PropTypes from 'prop-types';
 
 import { Button } from '@wordpress/components';
+import { __, sprintf } from '@wordpress/i18n';
+import { chevronLeft, chevronRight, plus } from '@wordpress/icons';
 
 /**
  * Inner Block Slider Navigation component.
+ *
+ * Icons are bundled SVGs from @wordpress/icons rather than dashicon names:
+ * the dashicons font is not loaded within the iframed block editor canvas,
+ * where named icons render as empty boxes.
  *
  * @param {Object}   props                 Props
  * @param {number}   props.totalPages      Total pages.
@@ -29,9 +35,10 @@ function Navigation( {
 		<div className="inner-block-slider__navigation">
 			<Button
 				disabled={ ! prevEnabled }
-				icon="arrow-left-alt2"
+				icon={ chevronLeft }
+				label={ __( 'Previous marker', 'hm-map-block' ) }
+				showTooltip
 				variant="secondary"
-				size="small"
 				onClick={ () => {
 					if ( prevEnabled ) {
 						setCurrentPage( currentPage - 1 );
@@ -41,15 +48,15 @@ function Navigation( {
 			{ [ ...Array( totalPages ).keys() ].map( ( i ) => (
 				<Button
 					key={ i + 1 }
-					aria-label={ `Slide ${ i + 1 }` }
-					className={ classNames(
-						'components-button',
-						'is-not-small',
-						{
-							'is-primary': currentPage === i + 1,
-							'is-secondary': currentPage !== i + 1,
-						}
+					aria-label={ sprintf(
+						/* translators: %d: marker number. */
+						__( 'Marker %d', 'hm-map-block' ),
+						i + 1
 					) }
+					className={ classNames( 'components-button', {
+						'is-primary': currentPage === i + 1,
+						'is-secondary': currentPage !== i + 1,
+					} ) }
 					type="button"
 					onClick={ () => {
 						setCurrentPage( i + 1 );
@@ -60,9 +67,10 @@ function Navigation( {
 			) ) }
 			<Button
 				disabled={ ! nextEnabled }
-				icon="arrow-right-alt2"
+				icon={ chevronRight }
+				label={ __( 'Next marker', 'hm-map-block' ) }
+				showTooltip
 				variant="secondary"
-				size="small"
 				onClick={ () => {
 					if ( nextEnabled ) {
 						setCurrentPage( currentPage + 1 );
@@ -71,9 +79,10 @@ function Navigation( {
 			/>
 			<Button
 				disabled={ ! addSlideEnabled }
-				icon="plus-alt2"
+				icon={ plus }
+				label={ __( 'Add a marker', 'hm-map-block' ) }
+				showTooltip
 				variant="secondary"
-				size="small"
 				onClick={ () => addSlide() }
 			/>
 		</div>

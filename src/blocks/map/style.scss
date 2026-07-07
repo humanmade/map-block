@@ -72,6 +72,52 @@
 	.wp-block-buttons {
 		display: inline-block; // Prevents overlap with nav arrows.
 	}
+
+	// Frontend prev/next arrows. The chevron glyph is drawn with borders so
+	// no icon font or image is required; accessible labels are provided as
+	// screen-reader text within the buttons. Colors are themeable via the
+	// custom properties.
+	.carousel__button {
+		align-items: center;
+		background: var(--hm-map-button-background, #fff);
+		border: 1px solid var(--hm-map-button-color, currentcolor);
+		border-radius: 50%;
+		color: var(--hm-map-button-color, currentcolor);
+		cursor: pointer;
+		display: inline-flex;
+		height: 2.75rem;
+		justify-content: center;
+		padding: 0;
+		width: 2.75rem;
+
+		&::before {
+			border-right: 2px solid currentcolor;
+			border-top: 2px solid currentcolor;
+			content: "";
+			display: block;
+			height: 0.625rem;
+			width: 0.625rem;
+		}
+
+		&:hover,
+		&:focus-visible {
+			background: var(--hm-map-button-color, currentcolor);
+			color: var(--hm-map-button-background, #fff);
+		}
+	}
+
+	.carousel__button--back::before {
+		transform: rotate(-135deg) translate(-15%, 15%);
+	}
+
+	.carousel__button--forward::before {
+		transform: rotate(45deg) translate(-15%, 15%);
+	}
+
+	.carousel-buttons {
+		display: flex;
+		gap: 0.5rem;
+	}
 }
 
 /* Vertically stacked (default) style. */
