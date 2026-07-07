@@ -48,3 +48,37 @@ export default function projectPoint(
 
 	return { x, y };
 }
+
+/**
+ * Invert projectPoint: percentage offsets within the artwork back to lat/long.
+ *
+ * @param {Object} point              Percentages.
+ * @param {number} point.x            Horizontal offset, 0-100.
+ * @param {number} point.y            Vertical offset, 0-100.
+ * @param {Object} options            Projection context.
+ * @param {Object} options.bounds     Geographic bounds { west, east, north, south }.
+ * @param {string} options.projection equirectangular (default) or mercator.
+ * @return {Object} { lat, long } in degrees.
+ */
+export function unprojectPoint(
+	{ x, y },
+	{ bounds, projection = 'equirectangular' }
+) {
+	const { west, east, north, south } = bounds;
+
+	const long = west + ( x / 100 ) * ( east - west );
+
+	let lat;
+	if ( projection === 'mercator' ) {
+		const yMercator =
+			mercatorY( north ) -
+			( y / 100 ) * ( mercatorY( north ) - mercatorY( south ) );
+		lat =
+			( ( 2 * Math.atan( Math.exp( yMercator ) ) - Math.PI / 2 ) * 180 ) /
+			Math.PI;
+	} else {
+		lat = north - ( y / 100 ) * ( north - south );
+	}
+
+	return { lat, long };
+}

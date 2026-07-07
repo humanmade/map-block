@@ -27,7 +27,7 @@ import './editor.scss';
 import InnerBlocksDisplaySingle from '../../components/inner-block-slider/inner-block-single-display';
 import Navigation from '../../components/inner-block-slider/navigation';
 import PaletteColorPicker from '../../components/palette-color-picker';
-import projectPoint from './project-point';
+import projectPoint, { unprojectPoint } from './project-point';
 
 let map = null;
 let mapItemIndex = 0;
@@ -289,6 +289,7 @@ const MapPreview = ( {
  * @param {Object[]} props.slideBlocks  Marker block array.
  * @param {boolean}  props.numberedPins Whether pins display their number.
  * @param {Function} props.onPinClick   Called with the clicked marker's index.
+ * @param {Function} props.onPinMove    Called with (clientId, { lat, long }) after a pin drag.
  * @return {Element} Static preview element.
  */
 const StaticMapPreview = ( {
@@ -298,45 +299,136 @@ const StaticMapPreview = ( {
 	slideBlocks,
 	numberedPins,
 	onPinClick,
-} ) => (
-	<div className="hm-map-static-preview">
-		{ imageUrl ? (
-			<img className="map__static-image" src={ imageUrl } alt="" />
-		) : (
-			<div className="hm-map-static-preview__placeholder">
-				{ __(
-					'Select a background image to position markers against.',
-					'hm-map-block'
-				) }
-			</div>
-		) }
-		{ slideBlocks.map( ( block, index ) => {
-			const point = projectPoint(
-				{
-					lat: block.attributes.lat,
-					long: block.attributes.long,
-				},
-				{ bounds, projection }
-			);
-			if ( ! point ) {
-				return null;
+	onPinMove,
+} ) => {
+	/**
+	 * Drag a pin over the artwork, committing new coordinates on release.
+	 *
+	 * Move/up listeners bind to the pin's ownerDocument so they fire in the
+	 * editor canvas iframe. During the drag the pin is positioned directly;
+	 * the attribute update on release re-renders it at the same spot.
+	 *
+	 * @param {PointerEvent} downEvent Pointer down on the pin.
+	 * @param {Object}       block     The pin's marker block.
+	 */
+	const startPinDrag = ( downEvent, block ) => {
+		downEvent.preventDefault();
+		downEvent.stopPropagation();
+
+		const pin = downEvent.currentTarget;
+		const container = pin.parentElement;
+		const doc = pin.ownerDocument;
+		const startX = downEvent.clientX;
+		const startY = downEvent.clientY;
+		let dragging = false;
+
+		const onPointerMove = ( moveEvent ) => {
+			// Ignore sub-3px jitter so a click stays a click.
+			if (
+				! dragging &&
+				Math.hypot(
+					moveEvent.clientX - startX,
+					moveEvent.clientY - startY
+				) < 3
+			) {
+				return;
 			}
-			return (
-				<button
-					key={ block.clientId }
-					className="marker"
-					style={ {
-						left: `${ point.x }%`,
-						top: `${ point.y }%`,
-					} }
-					onClick={ () => onPinClick( index, block.clientId ) }
-				>
-					{ numberedPins ? index + 1 : '' }
-				</button>
+			dragging = true;
+
+			const rect = container.getBoundingClientRect();
+			const x = Math.min(
+				Math.max(
+					( ( moveEvent.clientX - rect.left ) / rect.width ) * 100,
+					0
+				),
+				100
 			);
-		} ) }
-	</div>
-);
+			const y = Math.min(
+				Math.max(
+					( ( moveEvent.clientY - rect.top ) / rect.height ) * 100,
+					0
+				),
+				100
+			);
+			pin.style.left = `${ x }%`;
+			pin.style.top = `${ y }%`;
+		};
+
+		const onPointerUp = () => {
+			doc.removeEventListener( 'pointermove', onPointerMove );
+			doc.removeEventListener( 'pointerup', onPointerUp );
+
+			if ( ! dragging ) {
+				return;
+			}
+
+			// The click that ends the drag should not switch slides.
+			pin.dataset.justDragged = 'true';
+			onPinMove(
+				block.clientId,
+				unprojectPoint(
+					{
+						x: parseFloat( pin.style.left ),
+						y: parseFloat( pin.style.top ),
+					},
+					{ bounds, projection }
+				)
+			);
+		};
+
+		doc.addEventListener( 'pointermove', onPointerMove );
+		doc.addEventListener( 'pointerup', onPointerUp );
+	};
+
+	return (
+		<div className="hm-map-static-preview">
+			{ imageUrl ? (
+				<img className="map__static-image" src={ imageUrl } alt="" />
+			) : (
+				<div className="hm-map-static-preview__placeholder">
+					{ __(
+						'Select a background image to position markers against.',
+						'hm-map-block'
+					) }
+				</div>
+			) }
+			{ slideBlocks.map( ( block, index ) => {
+				const point = projectPoint(
+					{
+						lat: block.attributes.lat,
+						long: block.attributes.long,
+					},
+					{ bounds, projection }
+				);
+				if ( ! point ) {
+					return null;
+				}
+				return (
+					<button
+						key={ block.clientId }
+						className="marker"
+						style={ {
+							left: `${ point.x }%`,
+							top: `${ point.y }%`,
+						} }
+						onPointerDown={ ( event ) =>
+							startPinDrag( event, block )
+						}
+						onClick={ ( event ) => {
+							if ( event.currentTarget.dataset.justDragged ) {
+								delete event.currentTarget.dataset.justDragged;
+								return;
+							}
+							onPinClick( index, block.clientId );
+						} }
+					>
+						{ numberedPins ? index + 1 : '' }
+					</button>
+				);
+			} ) }
+		</div>
+	);
+};
 
 /**
  * The edit function describes the structure of your block in the context of the
@@ -1105,6 +1197,12 @@ const Edit = ( {
 						setCurrentItemIndex( index );
 						selectBlock( blockClientId );
 					} }
+					onPinMove={ ( blockClientId, latLong ) =>
+						updateBlockAttributes( blockClientId, {
+							lat: latLong.lat,
+							long: latLong.long,
+						} )
+					}
 				/>
 			) : (
 				<MapPreview
