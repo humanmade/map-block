@@ -549,8 +549,12 @@ const Edit = ( {
 						? `${ index + 1 }`
 						: '';
 
+					// Mapbox's built-in marker drag cannot be used here: it
+					// listens on its own realm's window, but the editor canvas
+					// is an iframe, so pointer events during a drag never reach
+					// it. Drag manually via the pin's ownerDocument instead.
 					const pin = new mapboxgl.Marker( markerDiv )
-						.setDraggable( true )
+						.setDraggable( false )
 						.setLngLat( coords )
 						.addTo( map );
 
@@ -559,8 +563,85 @@ const Edit = ( {
 						markerDiv.classList.add( 'active' );
 					}
 
+					let didJustDrag = false;
+
+					markerDiv.addEventListener(
+						'pointerdown',
+						( downEvent ) => {
+							// Keep the map's own pan handler from grabbing the
+							// gesture, and keep focus behavior stable.
+							downEvent.preventDefault();
+							downEvent.stopPropagation();
+
+							const doc = markerDiv.ownerDocument;
+							const canvas = map.getCanvasContainer();
+							const startX = downEvent.clientX;
+							const startY = downEvent.clientY;
+							let dragging = false;
+
+							const onPointerMove = ( moveEvent ) => {
+								// Ignore sub-3px jitter so a click stays a click.
+								if (
+									! dragging &&
+									Math.hypot(
+										moveEvent.clientX - startX,
+										moveEvent.clientY - startY
+									) < 3
+								) {
+									return;
+								}
+								dragging = true;
+
+								const rect = canvas.getBoundingClientRect();
+								pin.setLngLat(
+									map.unproject( [
+										moveEvent.clientX - rect.left,
+										moveEvent.clientY - rect.top,
+									] )
+								);
+							};
+
+							const onPointerUp = () => {
+								doc.removeEventListener(
+									'pointermove',
+									onPointerMove
+								);
+								doc.removeEventListener(
+									'pointerup',
+									onPointerUp
+								);
+
+								if ( ! dragging ) {
+									return;
+								}
+
+								didJustDrag = true;
+								const lngLat = pin.getLngLat();
+								updateBlockAttributes( blockId, {
+									lat: lngLat.lat,
+									long: lngLat.lng,
+								} );
+							};
+
+							doc.addEventListener(
+								'pointermove',
+								onPointerMove
+							);
+							doc.addEventListener( 'pointerup', onPointerUp );
+						}
+					);
+
 					// On click select the related slide and highlight the marker.
-					markerDiv.addEventListener( 'click', () => {
+					markerDiv.addEventListener( 'click', ( event ) => {
+						event.stopPropagation();
+
+						// The click that ends a drag should not change the
+						// selected slide.
+						if ( didJustDrag ) {
+							didJustDrag = false;
+							return;
+						}
+
 						Array.from( mapMarkers ).forEach( ( div ) =>
 							div.classList.remove( 'active' )
 						);
@@ -570,15 +651,6 @@ const Edit = ( {
 						mapItemIndex = index;
 						setCurrentItemIndex( index );
 						selectBlock( blockId );
-					} );
-
-					// On marker drag, update its attributes.
-					pin.on( 'dragend', () => {
-						const lngLat = pin.getLngLat();
-						updateBlockAttributes( blockId, {
-							lat: lngLat.lat,
-							long: lngLat.lng,
-						} );
 					} );
 				}
 
