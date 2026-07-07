@@ -11,14 +11,36 @@
 	.help {
 		color: #333;
 		font-size: 1rem;
-		margin-bottom: 0.5rem;
-		margin-top: -2rem;
+		margin: 0.5rem 0;
 	}
 
-	&:not(:has(.wp-block-hm-map-marker)) {
+	.inner-block-slider {
+		margin-top: 1rem;
+	}
 
-		.help {
-			margin-top: 0;
+	// Label above the marker card editing area.
+	.inner-block-slider__label {
+		color: #757575;
+		font-size: 11px;
+		font-weight: 500;
+		letter-spacing: 0.5px;
+		margin: 0 0 0.25rem;
+		text-transform: uppercase;
+	}
+
+	// Frame the active marker's card so the editing area reads as a distinct
+	// surface and cannot visually bleed into surrounding content.
+	.inner-block-slider .slides {
+		border: 1px dashed #949494;
+		border-radius: 2px;
+		overflow: hidden;
+		padding: 1rem;
+
+		// Highlight when the displayed marker (or a block within it) is
+		// selected, tying the card to its selected pin.
+		&:has(.is-selected, .has-child-selected) {
+			border-color: var(--wp-admin-theme-color, #3858e9);
+			border-style: solid;
 		}
 	}
 
@@ -30,7 +52,7 @@
 
 		.help {
 			color: inherit;
-			margin: 0;
+			margin: 0.5rem 0;
 			padding: 0.5rem;
 		}
 	}

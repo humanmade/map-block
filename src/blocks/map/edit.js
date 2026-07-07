@@ -1,5 +1,5 @@
 /* global hmMap:false */
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import { createBlock } from '@wordpress/blocks';
 import {
 	InspectorControls,
@@ -1217,6 +1217,29 @@ const Edit = ( {
 				/>
 			) }
 			<div className="inner-block-slider">
+				<p className="inner-block-slider__label">
+					{ ( () => {
+						if ( ! slideBlocks.length ) {
+							return __( 'Marker content', 'hm-map-block' );
+						}
+						const labelFormat = isTooltipMode
+							? /* translators: 1: marker number. 2: total marker count. */
+							  __(
+									'Tooltip content — marker %1$d of %2$d',
+									'hm-map-block'
+							  )
+							: /* translators: 1: marker number. 2: total marker count. */
+							  __(
+									'Slide content — marker %1$d of %2$d',
+									'hm-map-block'
+							  );
+						return sprintf(
+							labelFormat,
+							currentItemIndex + 1,
+							slideBlocks.length
+						);
+					} )() }
+				</p>
 				<InnerBlocksDisplaySingle
 					allowedBlocks={ [ 'hm/map-marker' ] }
 					className="slides"
