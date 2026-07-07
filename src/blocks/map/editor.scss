@@ -18,6 +18,18 @@
 		margin-top: 1rem;
 	}
 
+	// Collapse the card editing area unless the map (or a marker within it)
+	// is being edited, keeping the block compact while browsing content.
+	.inner-block-slider--collapsed {
+		display: none;
+	}
+
+	// Outline the pin whose card is displayed, on both map previews.
+	.marker.active {
+		outline: 2px solid var(--wp-admin-theme-color, #3858e9);
+		outline-offset: 2px;
+	}
+
 	// Label above the marker card editing area.
 	.inner-block-slider__label {
 		color: #757575;

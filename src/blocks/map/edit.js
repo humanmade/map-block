@@ -288,6 +288,7 @@ const MapPreview = ( {
  * @param {string}   props.projection   equirectangular or mercator.
  * @param {Object[]} props.slideBlocks  Marker block array.
  * @param {boolean}  props.numberedPins Whether pins display their number.
+ * @param {number}   props.activeIndex  Index of the marker whose pin is highlighted.
  * @param {Function} props.onPinClick   Called with the clicked marker's index.
  * @param {Function} props.onPinMove    Called with (clientId, { lat, long }) after a pin drag.
  * @return {Element} Static preview element.
@@ -298,6 +299,7 @@ const StaticMapPreview = ( {
 	projection,
 	slideBlocks,
 	numberedPins,
+	activeIndex,
 	onPinClick,
 	onPinMove,
 } ) => {
@@ -406,7 +408,9 @@ const StaticMapPreview = ( {
 				return (
 					<button
 						key={ block.clientId }
-						className="marker"
+						className={
+							index === activeIndex ? 'marker active' : 'marker'
+						}
 						style={ {
 							left: `${ point.x }%`,
 							top: `${ point.y }%`,
@@ -437,6 +441,7 @@ const StaticMapPreview = ( {
  * @param {Object}   props                      Block Props.
  * @param {Object}   props.attributes           Block Attributes.
  * @param {number}   props.clientId             Client ID.
+ * @param {boolean}  props.isSelected           Whether this block is selected.
  * @param {Function} props.setAttributes        Set Block Attributes.
  * @param {Object}   props.markerActiveColor    Color object for the active marker.
  * @param {Function} props.setMarkerActiveColor Function to update the active marker color.
@@ -449,6 +454,7 @@ const StaticMapPreview = ( {
 const Edit = ( {
 	attributes,
 	clientId,
+	isSelected,
 	setAttributes,
 	markerActiveColor,
 	setMarkerActiveColor,
@@ -495,12 +501,67 @@ const Edit = ( {
 		select( 'core/edit-post' ).getActiveGeneralSidebarName()
 	);
 
+	// Whether editing is happening within this block, and if so which marker
+	// (if any) holds the selection — e.g. via a pin click or the List View.
+	const { hasSelectionInside, selectedMarkerIndex } = useSelect(
+		( select ) => {
+			const blockEditor = select( 'core/block-editor' );
+			return {
+				hasSelectionInside: blockEditor.hasSelectedInnerBlock(
+					clientId,
+					true
+				),
+				selectedMarkerIndex: slideBlocks.findIndex(
+					( block ) =>
+						block.clientId ===
+							blockEditor.getSelectedBlockClientId() ||
+						blockEditor.hasSelectedInnerBlock(
+							block.clientId,
+							true
+						)
+				),
+			};
+		},
+		[ clientId, slideBlocks ]
+	);
+	const isEditingThisMap = isSelected || hasSelectionInside;
+
+	// Keep the displayed card in step with outside selection changes.
+	useEffect( () => {
+		if (
+			selectedMarkerIndex >= 0 &&
+			selectedMarkerIndex !== currentItemIndex
+		) {
+			setCurrentItemIndex( selectedMarkerIndex );
+		}
+		// Only react to selection movement; the pager sets the index directly.
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [ selectedMarkerIndex ] );
+
+	// Keep the map pins' active highlight in step with the displayed card,
+	// however it was changed (pin click, pager, or outside selection).
+	useEffect( () => {
+		mapItemIndex = currentItemIndex;
+		if ( ! map ) {
+			return;
+		}
+		const activeId = slideBlocks[ currentItemIndex ]?.attributes.id;
+		Array.from(
+			map.getContainer().getElementsByClassName( 'marker' )
+		).forEach( ( pin ) => {
+			pin.classList.toggle(
+				'active',
+				parseInt( pin.dataset.id ) === activeId
+			);
+		} );
+	}, [ currentItemIndex, slideBlocks ] );
+
 	useEffect( () => {
 		if ( ! map ) {
 			return;
 		}
 		setTimeout( () => map.resize(), 250 );
-	}, [ currentItemIndex, slideCount, activeSidebar ] );
+	}, [ currentItemIndex, slideCount, activeSidebar, isEditingThisMap ] );
 
 	useEffect( () => {
 		// Resolve ID conflicts when a block is duplicated using the editor UI.
@@ -1193,6 +1254,7 @@ const Edit = ( {
 					projection={ attributes.projection }
 					slideBlocks={ slideBlocks }
 					numberedPins={ numberedPins }
+					activeIndex={ currentItemIndex }
 					onPinClick={ ( index, blockClientId ) => {
 						setCurrentItemIndex( index );
 						selectBlock( blockClientId );
@@ -1216,7 +1278,13 @@ const Edit = ( {
 					aspectRatio={ aspectRatio }
 				/>
 			) }
-			<div className="inner-block-slider">
+			<div
+				className={
+					isEditingThisMap
+						? 'inner-block-slider'
+						: 'inner-block-slider inner-block-slider--collapsed'
+				}
+			>
 				<p className="inner-block-slider__label">
 					{ ( () => {
 						if ( ! slideBlocks.length ) {
