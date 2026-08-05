@@ -1,0 +1,466 @@
+@use "../../helpers/variables";
+
+.wp-block-hm-map {
+	display: grid;
+	grid-template-rows: auto auto;
+	grid-template-columns: 1fr;
+	grid-template-areas:
+		"main"
+		"sidebar";
+
+	.wp-block-group.alignfull,
+	.alignfull {
+		margin: 0;
+		width: 100%;
+	}
+
+	.alignwide {
+		max-width: variables.$width-breakpoint-wide;
+	}
+
+	.mapboxgl-control-container {
+		margin: auto;
+		max-width: variables.$width-breakpoint-wide;
+	}
+
+	.mapboxgl-ctrl-top-right {
+		position: relative;
+	}
+
+	.mapboxgl-ctrl-logo {
+		display: none !important;
+	}
+
+	.marker {
+		content: "";
+		cursor: pointer;
+		background: var(--hm-map-pin-color, #000);
+		background-size: cover;
+		border: none;
+		border-radius: 50%;
+		color: var(--hm-map-pin-text-color, #fff);
+		align-items: center;
+		display: flex;
+		font-size: variables.$font-size-base;
+		font-weight: 700;
+		justify-content: center;
+		height: 1.5rem;
+		width: 1.5rem;
+	}
+
+	.cluster {
+		color: var(--hm-map-pin-text-color, #fff);
+		cursor: pointer;
+		background: var(--hm-map-pin-color, #000);
+		background-size: cover;
+		border: none;
+		border-radius: 50%;
+		font-size: variables.$font-size-base;
+		height: 2rem;
+		text-align: center;
+		width: 2rem;
+		padding-top: 0.35rem;
+	}
+
+	.marker.active,
+	.cluster.active {
+		background: var(--hm-map-marker-active-color, #ff7800);
+		height: 1.8rem;
+		width: 1.8rem;
+	}
+
+	.wp-block-buttons {
+		display: inline-block; // Prevents overlap with nav arrows.
+	}
+
+	// Frontend prev/next arrows. The chevron glyph is drawn with borders so
+	// no icon font or image is required; accessible labels are provided as
+	// screen-reader text within the buttons. Colors are themeable via the
+	// custom properties.
+	.carousel__button {
+		align-items: center;
+		background: var(--hm-map-button-background, #fff);
+		border: 1px solid var(--hm-map-button-color, currentcolor);
+		border-radius: 50%;
+		color: var(--hm-map-button-color, currentcolor);
+		cursor: pointer;
+		display: inline-flex;
+		height: 2.75rem;
+		justify-content: center;
+		padding: 0;
+		width: 2.75rem;
+
+		&::before {
+			border-right: 2px solid currentcolor;
+			border-top: 2px solid currentcolor;
+			content: "";
+			display: block;
+			height: 0.625rem;
+			width: 0.625rem;
+		}
+
+		&:hover,
+		&:focus-visible {
+			background: var(--hm-map-button-color, currentcolor);
+			color: var(--hm-map-button-background, #fff);
+		}
+	}
+
+	.carousel__button--back::before {
+		transform: rotate(-135deg) translate(-15%, 15%);
+	}
+
+	.carousel__button--forward::before {
+		transform: rotate(45deg) translate(-15%, 15%);
+	}
+
+	.carousel-buttons {
+		display: flex;
+		gap: 0.5rem;
+	}
+}
+
+/* Vertically stacked (default) style. */
+.wp-block-hm-map:not(.is-style-side-by-side) {
+
+	.map__canvas {
+		background-color: #fff;
+	}
+
+	&::after {
+		box-shadow: inset 0 3px 10px -10px rgba(0, 0, 0, 0.75);
+		content: "";
+		height: 10px;
+		position: absolute;
+		top: 0;
+		width: 100%;
+		z-index: 1;
+	}
+
+	.mapboxgl-map {
+		height: 300px;
+		margin: auto;
+		width: 100%;
+
+		@media only screen and (min-width: 782px) {
+			height: 250px;
+		}
+	}
+
+	.carousel-buttons {
+		grid-area: main;
+		position: absolute;
+		bottom: 0;
+		right: 1rem;
+		display: flex;
+		justify-content: flex-end;
+		// On narrow screens, put arrows at bottom of the content column image.
+		transform: translate(0, calc(300px + 50%));
+
+		@media screen and (min-width: 782px) {
+			grid-area: sidebar;
+			bottom: 2rem;
+			right: max(2rem, calc((100vw - 1200px) / 2));
+			transform: none;
+		}
+	}
+}
+
+.wp-block-hm-map__container.wp-block-group.has-background:not(
+:only-child
+) {
+	padding-bottom: 0 !important;
+}
+
+.wp-block-hm-map-marker {
+
+	&.animate {
+		transition: all 0.25s;
+	}
+
+	.wp-block-group.alignfull,
+	.alignfull {
+		margin: 0;
+		width: 100%;
+	}
+
+	.wp-block-group.has-background:not(:only-child) {
+		margin-bottom: 0;
+	}
+}
+
+// These general non-layout styles are sandboxed to the side-by-side mode
+// as of July 2025. They could be expanded to apply to all maps if it is
+// acceptable to retroactively change design on e.g. old annual reports.
+.wp-block-hm-map.is-style-side-by-side {
+
+	.marker.active {
+		outline: 4px solid #fff;
+		outline-offset: -6px;
+	}
+
+	// These controls aren't accessible on the <p> block yet.
+	.hm-map-slide__location {
+		font-weight: 700;
+		font-style: italic;
+		margin-bottom: 1rem;
+	}
+
+	.wp-block-buttons {
+		font-size: clamp(1rem, 1vw + 0.5rem, 1.25rem);
+	}
+
+	@media screen and (max-width: 719px /* 45rem - 1px */) {
+
+		.is-layout-constrained > &:not(.alignfull) {
+			// Always full-bleed on small viewports. Override core style.
+			margin-left: calc(-1 * var(--wp--style--root--padding-left)) !important;
+			margin-right: calc(-1 * var(--wp--style--root--padding-right)) !important;
+		}
+	}
+
+	@media screen and (min-width: 45rem) {
+		grid-template-columns: 70% 30%;
+		grid-template-rows: 1fr;
+		grid-template-areas: "main sidebar";
+		align-items: stretch;
+		width: 100%;
+		position: relative;
+		margin: auto;
+
+		&.alignfull {
+			width: 100vw;
+		}
+
+		.map__canvas {
+			background-color: #f2f2f2;
+			min-height: 100%;
+			grid-area: main;
+		}
+
+		.carousel__carousel-wrapper {
+			grid-area: sidebar;
+
+			> * {
+				margin: 1.5rem;
+			}
+		}
+
+		.hm-map-slide {
+
+			> .wp-block-columns {
+				display: flex;
+				flex-direction: column;
+				gap: 1.5rem;
+				justify-content: flex-start;
+			}
+
+			&,
+			&.wp-block-group.has-background {
+				padding: 1.5rem;
+			}
+
+			> .wp-block-columns > .wp-block-column > *:not(:last-child) {
+				margin-top: 0;
+				margin-bottom: 1rem;
+			}
+
+			.wp-block-image img {
+				border-radius: 0.25rem;
+			}
+		}
+	}
+
+	.carousel__carousel-wrapper {
+		// Stack all cards on top of each other.
+		display: grid;
+		grid-template-rows: 1fr;
+		grid-template-columns: 1fr;
+		padding-bottom: 4rem;
+	}
+
+	.wp-block-hm-map-marker {
+		grid-column: 1;
+		grid-row: 1;
+		margin: 0;
+
+		> .alignfull {
+			margin: 0;
+
+			&.has-background {
+				// Make room for arrows but extend bg to bottom.
+				margin-bottom: -4rem !important;
+				padding-bottom: 5rem !important;
+			}
+		}
+
+		> :not(.alignfull) {
+			margin: var(--wp--style--root--padding-left, 1rem);
+
+			@media screen and (min-width: 45rem) {
+				margin: 1.5rem;
+			}
+		}
+	}
+
+	// Avoid CLS when loading in. May be better to switch to a .nojs class?
+	&.carousel--uninitialized .wp-block-hm-map-marker:not(:first-of-type),
+	// But we also need to guard against flash of content *while initializing*.
+	.carousel__carousel-wrapper:not(:has(> [style])) .wp-block-hm-map-marker:not(:first-child) {
+		display: none;
+	}
+
+	.carousel-buttons {
+		grid-area: sidebar;
+		position: absolute;
+		bottom: 1rem;
+		left: 0.5rem;
+
+		@media screen and (max-width: 45rem) {
+			transform: scale(-90%, -90%);
+		}
+	}
+}
+
+/* Tooltip display mode. */
+.wp-block-hm-map.map--tooltips {
+	display: block;
+
+	.mapboxgl-map {
+		height: 480px;
+		width: 100%;
+	}
+
+	// Marker content renders inside the popup (or the small-screen list);
+	// the source elements stay hidden.
+	.map__marker-content {
+		display: none;
+	}
+
+	.marker {
+		height: 2rem;
+		width: 2rem;
+	}
+
+	.marker.active {
+		height: 2.2rem;
+		width: 2.2rem;
+	}
+}
+
+// Popup card. Structural styles only: typography, colors and radii are left
+// to the integrating theme (see readme), on top of mapbox-gl.css defaults.
+.hm-map-popup {
+
+	.mapboxgl-popup-content {
+		background: var(--hm-map-popup-background, #fff);
+		border-radius: var(--hm-map-popup-radius, 0.25rem);
+		color: var(--hm-map-popup-color, inherit);
+		max-width: var(--hm-map-popup-max-width, 20rem);
+		padding: 1rem;
+	}
+
+	.mapboxgl-popup-close-button {
+		height: 1.5rem;
+		width: 1.5rem;
+	}
+
+	.hm-map-popup__content img {
+		height: auto;
+		max-width: 100%;
+	}
+}
+
+// Small-screen list behavior: hide pins, show marker content below the map.
+@media screen and (max-width: 719px) {
+
+	.wp-block-hm-map.map--tooltips.map--mobile-list {
+
+		.marker,
+		.cluster {
+			display: none;
+		}
+
+		.map__marker-content {
+			display: block;
+		}
+
+		.wp-block-hm-map-marker {
+			border-bottom: 1px solid var(--hm-map-list-divider-color, currentcolor);
+			padding: 1rem 0;
+		}
+	}
+}
+
+/* Static render mode: artwork + projected pins, no Mapbox. */
+.wp-block-hm-map.map--static {
+
+	.map__canvas {
+		min-height: 0;
+		position: relative;
+	}
+
+	.map__static-image {
+		display: block;
+		height: auto;
+		width: 100%;
+	}
+
+	.marker {
+		border: none;
+		padding: 0;
+		position: absolute;
+		transform: translate(-50%, -50%);
+	}
+
+	.hm-map-popup--static {
+		background: var(--hm-map-popup-background, #fff);
+		border-radius: var(--hm-map-popup-radius, 0.25rem);
+		box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+		color: var(--hm-map-popup-color, inherit);
+		max-width: var(--hm-map-popup-max-width, 20rem);
+		min-width: 12rem;
+		padding: 1rem;
+		position: absolute;
+		transform: translate(-50%, calc(-100% - 1.5rem));
+		z-index: 2;
+
+		// Caret pointing at the pin.
+		&::after {
+			border: 0.5rem solid transparent;
+			border-top-color: var(--hm-map-popup-background, #fff);
+			content: "";
+			left: 50%;
+			position: absolute;
+			top: 100%;
+			transform: translateX(-50%);
+		}
+
+		img {
+			height: auto;
+			max-width: 100%;
+		}
+	}
+
+	.hm-map-popup__close {
+		background: none;
+		border: none;
+		color: inherit;
+		cursor: pointer;
+		font-size: 1rem;
+		line-height: 1;
+		padding: 0.25rem;
+		position: absolute;
+		right: 0.25rem;
+		top: 0.25rem;
+	}
+}
+
+/* Fixed aspect ratio: the inline aspect-ratio style replaces the default
+   fixed canvas heights set per display mode above. */
+.wp-block-hm-map .map__canvas--fixed-aspect,
+.wp-block-hm-map .map__canvas--fixed-aspect.mapboxgl-map {
+	height: auto;
+	min-height: 0;
+	width: 100%;
+}

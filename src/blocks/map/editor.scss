@@ -1,0 +1,95 @@
+.wp-block-hm-map .block-editor-block-list__layout > .wp-block[data-align="full"] {
+	max-width: 100%;
+
+	.wp-block:not([data-align="full"]) {
+		max-width: 960px;
+	}
+}
+
+.wp-block-hm-map {
+
+	.help {
+		color: #333;
+		font-size: 1rem;
+		margin: 0.5rem 0;
+	}
+
+	.inner-block-slider {
+		margin-top: 1rem;
+	}
+
+	// Collapse the card editing area unless the map (or a marker within it)
+	// is being edited, keeping the block compact while browsing content.
+	.inner-block-slider--collapsed {
+		display: none;
+	}
+
+	// Outline the pin whose card is displayed, on both map previews.
+	.marker.active {
+		outline: 2px solid var(--wp-admin-theme-color, #3858e9);
+		outline-offset: 2px;
+	}
+
+	.inner-block-slider__navigation {
+		align-items: center;
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.25rem;
+		margin-top: 0.5rem;
+	}
+
+	// Label above the marker card editing area.
+	.inner-block-slider__label {
+		color: #757575;
+		font-size: 11px;
+		font-weight: 500;
+		letter-spacing: 0.5px;
+		margin: 0 0 0.25rem;
+		text-transform: uppercase;
+	}
+
+	// Frame the active marker's card so the editing area reads as a distinct
+	// surface and cannot visually bleed into surrounding content.
+	.inner-block-slider .slides {
+		border: 1px dashed #949494;
+		border-radius: 2px;
+		overflow: hidden;
+		padding: 1rem;
+
+		// Highlight when the displayed marker (or a block within it) is
+		// selected, tying the card to its selected pin.
+		&:has(.is-selected, .has-child-selected) {
+			border-color: var(--wp-admin-theme-color, #3858e9);
+			border-style: solid;
+		}
+	}
+
+	&.is-style-side-by-side {
+
+		> .inner-block-slider {
+			min-width: 250px;
+		}
+
+		.help {
+			color: inherit;
+			margin: 0.5rem 0;
+			padding: 0.5rem;
+		}
+	}
+}
+
+/* Static render mode editor preview. */
+.hm-map-static-preview {
+	position: relative;
+
+	.hm-map-static-preview__placeholder {
+		align-items: center;
+		background: #f0f0f0;
+		color: #333;
+		display: flex;
+		justify-content: center;
+		min-height: 250px;
+		padding: 2rem;
+		text-align: center;
+	}
+}

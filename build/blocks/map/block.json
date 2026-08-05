@@ -1,0 +1,127 @@
+{
+  "$schema": "https://schemas.wp.org/trunk/block.json",
+  "apiVersion": 3,
+  "name": "hm/map",
+  "version": "0.1.0",
+  "title": "Map",
+  "category": "widgets",
+  "icon": "location-alt",
+  "description": "A Mapbox-backed map with markers which reveal associated content.",
+  "styles": [
+    {
+      "name": "stacked",
+      "label": "Stacked",
+      "isDefault": true
+    },
+    {
+      "name": "side-by-side",
+      "label": "Side-by-side"
+    }
+  ],
+  "attributes": {
+    "mapStyle": {
+      "type": "string",
+      "default": "mapbox://styles/mapbox/light-v11"
+    },
+    "displayMode": {
+      "type": "string",
+      "default": "carousel"
+    },
+    "renderMode": {
+      "type": "string",
+      "default": "interactive"
+    },
+    "staticImageUrl": {
+      "type": "string",
+      "default": ""
+    },
+    "staticImageId": {
+      "type": "number",
+      "default": 0
+    },
+    "boundsWest": {
+      "type": "number",
+      "default": -180
+    },
+    "boundsEast": {
+      "type": "number",
+      "default": 180
+    },
+    "boundsNorth": {
+      "type": "number",
+      "default": 85
+    },
+    "boundsSouth": {
+      "type": "number",
+      "default": -85
+    },
+    "numberedPins": {
+      "type": "boolean",
+      "default": true
+    },
+    "mobileBehavior": {
+      "type": "string",
+      "default": "keep-pins"
+    },
+    "markerActiveColor": {
+      "type": "string"
+    },
+    "markerColor": {
+      "type": "string"
+    },
+    "projection": {
+      "type": "string",
+      "default": "equirectangular"
+    },
+    "centerLat": {
+      "type": "number",
+      "default": 8.18
+    },
+    "centerLon": {
+      "type": "number",
+      "default": 9
+    },
+    "zoom": {
+      "type": "number",
+      "default": 0.5
+    },
+    "allowZoom": {
+      "type": "boolean",
+      "default": true
+    },
+    "aspectRatio": {
+      "type": "string",
+      "default": ""
+    },
+    "minZoom": {
+      "type": "number",
+      "default": 0
+    },
+    "maxZoom": {
+      "type": "number",
+      "default": 22
+    }
+  },
+  "example": {},
+  "supports": {
+    "html": false,
+    "multiple": false,
+    "align": [
+      "full",
+      "wide"
+    ],
+    "color": {
+      "background": true,
+      "text": false
+    }
+  },
+  "textdomain": "hm-map-block",
+  "editorScript": "file:./index.js",
+  "editorStyle": "file:./index.css",
+  "render": "file:./render.php",
+  "style": "file:./style-index.css",
+  "viewScript": [
+    "file:./view.js",
+    "mapbox-gl"
+  ]
+}

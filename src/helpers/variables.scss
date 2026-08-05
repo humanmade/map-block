@@ -1,0 +1,9 @@
+// Shared style tokens for the map blocks.
+// Only the values actually consumed by block styles live here; integrating
+// themes are expected to control typography and layout via theme.json.
+
+// Width cap applied to wide-aligned content within the map.
+$width-breakpoint-wide: 1200px;
+
+// Base font size for map UI chrome (cluster counts, etc).
+$font-size-base: 0.95rem;

@@ -1,0 +1,5 @@
+# Local-only checkouts and generated output.
+reference/
+build/
+vendor/
+node_modules/
