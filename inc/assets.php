@@ -23,7 +23,6 @@ function bootstrap(): void {
 	// Enqueue frontend assets when a map actually renders: has_block() based
 	// checks miss archive and home views which render many posts.
 	add_filter( 'render_block_hm/map', __NAMESPACE__ . '\\enqueue_frontend_assets', 10, 2 );
-	add_filter( 'render_block_wmf-reports/map', __NAMESPACE__ . '\\enqueue_frontend_assets', 10, 2 );
 }
 
 /**
@@ -80,8 +79,8 @@ function enqueue_editor_mapbox_styles(): void {
 /**
  * Enqueue Mapbox styles and localize the API key when a map block renders.
  *
- * Runs on the render_block filter for both current and legacy block names,
- * which fires before footer scripts print regardless of the query type.
+ * Runs on the render_block filter, which fires before footer scripts print
+ * regardless of the query type.
  *
  * @param string $block_content Rendered block markup.
  * @param array  $block         Parsed block, including attributes.
