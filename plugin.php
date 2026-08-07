@@ -2,7 +2,7 @@
 /**
  * Plugin Name:       HM Map Block
  * Description:       A Mapbox-backed map block with markers, carousel and tooltip display modes.
- * Version:           0.1.0
+ * Version:           0.1.1
  * Requires at least: 6.5
  * Requires PHP:      8.1
  * Author:            Human Made
