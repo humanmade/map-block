@@ -20,7 +20,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	die;
 }
 
-const PLUGIN_VERSION = '0.1.0';
+const PLUGIN_VERSION = '0.1.1';
 const PLUGIN_PATH    = __DIR__;
 
 require_once __DIR__ . '/inc/namespace.php';
