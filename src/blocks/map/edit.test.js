@@ -37,6 +37,7 @@ jest.mock( 'mapbox-gl', () => {
 		'addSource',
 		'addLayer',
 		'isSourceLoaded',
+		'panBy',
 	];
 	class Map {
 		constructor( options ) {
@@ -45,7 +46,14 @@ jest.mock( 'mapbox-gl', () => {
 			this.calls = Object.fromEntries(
 				methods.map( ( m ) => [ m, [] ] )
 			);
+			this.canvasContainer = global.document.body.appendChild(
+				global.document.createElement( 'div' )
+			);
 			mockMaps.push( this );
+		}
+
+		getCanvasContainer() {
+			return this.canvasContainer;
 		}
 
 		on( event, handler ) {
@@ -95,6 +103,54 @@ describe( 'MapPreview', () => {
 		expect( mockLog.indexOf( 'resize' ) ).toBeLessThan(
 			mockLog.indexOf( 'jumpTo' )
 		);
+
+		act( () => root.unmount() );
+	} );
+
+	it( 'pans the map from same-document pointer deltas instead of mapbox dragPan', () => {
+		const container = document.createElement( 'div' );
+		const root = createRoot( container );
+
+		act( () => {
+			root.render(
+				<MapPreview
+					zoom={ 1 }
+					latitude={ 10 }
+					longitude={ 20 }
+					slideBlocks={ [] }
+					updateMarkers={ jest.fn() }
+					mapStyle=""
+				/>
+			);
+		} );
+
+		const map = mockMaps[ mockMaps.length - 1 ];
+		expect( map.options.dragPan ).toBe( false );
+
+		const fire = ( target, type, x, y, button = 0 ) =>
+			target.dispatchEvent(
+				new window.MouseEvent( type, {
+					bubbles: true,
+					button,
+					clientX: x,
+					clientY: y,
+				} )
+			);
+
+		fire( map.canvasContainer, 'pointerdown', 100, 100, 2 );
+		fire( document, 'pointermove', 150, 150 );
+		expect( map.calls.panBy ).toHaveLength( 0 );
+
+		fire( map.canvasContainer, 'pointerdown', 100, 100 );
+		fire( document, 'pointermove', 300, 100 );
+		fire( document, 'pointermove', 300, 150 );
+		fire( document, 'pointerup', 300, 150 );
+		fire( document, 'pointermove', 400, 400 );
+
+		expect( map.calls.panBy ).toEqual( [
+			[ [ -200, 0 ], { animate: false } ],
+			[ [ 0, -50 ], { animate: false } ],
+		] );
 
 		act( () => root.unmount() );
 	} );

@@ -164,6 +164,7 @@ export const MapPreview = ( {
 			// Fast repeat clicks while selecting or placing pins should not
 			// zoom the canvas; zoom via the nav control instead.
 			doubleClickZoom: false,
+			dragPan: false,
 			minZoom: 0,
 			projection,
 			renderWorldCopies: false,
@@ -173,6 +174,37 @@ export const MapPreview = ( {
 		} );
 
 		map.addControl( fullScreenControl );
+
+		// Mapbox's built-in drag pan mixes pointer coordinates from the parent
+		// window and the editor iframe, so the map jumps by the iframe's
+		// offset. Pan from deltas read in one document instead.
+		const canvas = map.getCanvasContainer();
+		canvas.addEventListener( 'pointerdown', ( downEvent ) => {
+			if ( downEvent.button !== 0 ) {
+				return;
+			}
+
+			const doc = canvas.ownerDocument;
+			let lastX = downEvent.clientX;
+			let lastY = downEvent.clientY;
+
+			const onPointerMove = ( moveEvent ) => {
+				map.panBy(
+					[ lastX - moveEvent.clientX, lastY - moveEvent.clientY ],
+					{ animate: false }
+				);
+				lastX = moveEvent.clientX;
+				lastY = moveEvent.clientY;
+			};
+
+			const onPointerUp = () => {
+				doc.removeEventListener( 'pointermove', onPointerMove );
+				doc.removeEventListener( 'pointerup', onPointerUp );
+			};
+
+			doc.addEventListener( 'pointermove', onPointerMove );
+			doc.addEventListener( 'pointerup', onPointerUp );
+		} );
 
 		const slideMarkers = JSON.parse( serializedFeatures );
 
