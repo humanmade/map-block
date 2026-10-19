@@ -84,7 +84,7 @@ const aspectRatioOptions = [
  * @param {Function} props.updateMarkers Callback to update map pins.
  * @return {React.ReactNode} Container node for Map.
  */
-const MapPreview = ( {
+export const MapPreview = ( {
 	mapStyle,
 	projection = 'equirectangular',
 	latitude = 0,
@@ -97,6 +97,14 @@ const MapPreview = ( {
 	updateMarkers,
 } ) => {
 	const containerRef = useRef( null );
+
+	// The init effect must not re-run on view changes, so it reads the latest
+	// view from a ref.
+	const viewRef = useRef();
+	viewRef.current = {
+		center: [ longitude || 0, latitude || 0 ],
+		zoom: zoom ?? 1,
+	};
 
 	// Parse the slideBlocks into a stable JSON string, which we can use
 	// to rerender the map as needed without unnecessarily causing it to
@@ -146,6 +154,7 @@ const MapPreview = ( {
 		// realm, so mapbox accepts it, while the node renders in the canvas.
 		const mapContainer = document.createElement( 'div' );
 		mapContainer.style.minHeight = '250px';
+		mapContainer.style.height = '100%';
 		containerRef.current.appendChild( mapContainer );
 
 		mapboxgl.accessToken = hmMap.apiKey;
@@ -155,19 +164,55 @@ const MapPreview = ( {
 			// Fast repeat clicks while selecting or placing pins should not
 			// zoom the canvas; zoom via the nav control instead.
 			doubleClickZoom: false,
+			dragPan: false,
 			minZoom: 0,
 			projection,
 			renderWorldCopies: false,
 			scrollZoom: false,
 			style: mapStyle || 'mapbox://styles/mapbox/light-v11',
-			zoom: zoom || 1,
+			zoom: zoom ?? 1,
 		} );
 
 		map.addControl( fullScreenControl );
 
+		// Mapbox's built-in drag pan mixes pointer coordinates from the parent
+		// window and the editor iframe, so the map jumps by the iframe's
+		// offset. Pan from deltas read in one document instead.
+		const canvas = map.getCanvasContainer();
+		canvas.addEventListener( 'pointerdown', ( downEvent ) => {
+			if ( downEvent.button !== 0 ) {
+				return;
+			}
+
+			const doc = canvas.ownerDocument;
+			let lastX = downEvent.clientX;
+			let lastY = downEvent.clientY;
+
+			const onPointerMove = ( moveEvent ) => {
+				map.panBy(
+					[ lastX - moveEvent.clientX, lastY - moveEvent.clientY ],
+					{ animate: false }
+				);
+				lastX = moveEvent.clientX;
+				lastY = moveEvent.clientY;
+			};
+
+			const onPointerUp = () => {
+				doc.removeEventListener( 'pointermove', onPointerMove );
+				doc.removeEventListener( 'pointerup', onPointerUp );
+			};
+
+			doc.addEventListener( 'pointermove', onPointerMove );
+			doc.addEventListener( 'pointerup', onPointerUp );
+		} );
+
 		const slideMarkers = JSON.parse( serializedFeatures );
 
 		map.on( 'load', () => {
+			// The container may have changed size since creation (iframed canvas).
+			map.resize();
+			map.jumpTo( viewRef.current );
+
 			// For clustering we need to add a data source.
 			map.addSource( 'markers', {
 				type: 'geojson',
@@ -255,7 +300,7 @@ const MapPreview = ( {
 			map.setCenter( [ longitude || 0, latitude || 0 ] );
 			map.setMinZoom( minZoom );
 			map.setMaxZoom( maxZoom );
-			map.setZoom( zoom || 1 );
+			map.setZoom( zoom ?? 1 );
 		}
 	}, [ projection, latitude, longitude, zoom, minZoom, maxZoom ] );
 
