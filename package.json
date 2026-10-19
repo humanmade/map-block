@@ -12,6 +12,7 @@
 		"lint:js": "wp-scripts lint-js",
 		"lint:pkg-json": "wp-scripts lint-pkg-json",
 		"packages-update": "wp-scripts packages-update",
+		"test:unit": "wp-scripts test-unit-js",
 		"plugin-zip": "wp-scripts plugin-zip",
 		"env:cli": "npx @wordpress/env run cli",
 		"env:db": "npx @wordpress/env run cli -- mysql -uroot -ppassword wordpress --host=mysql",

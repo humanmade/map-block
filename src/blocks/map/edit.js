@@ -84,7 +84,7 @@ const aspectRatioOptions = [
  * @param {Function} props.updateMarkers Callback to update map pins.
  * @return {React.ReactNode} Container node for Map.
  */
-const MapPreview = ( {
+export const MapPreview = ( {
 	mapStyle,
 	projection = 'equirectangular',
 	latitude = 0,
@@ -97,6 +97,14 @@ const MapPreview = ( {
 	updateMarkers,
 } ) => {
 	const containerRef = useRef( null );
+
+	// The init effect must not re-run on view changes, so it reads the latest
+	// view from a ref.
+	const viewRef = useRef();
+	viewRef.current = {
+		center: [ longitude || 0, latitude || 0 ],
+		zoom: zoom ?? 1,
+	};
 
 	// Parse the slideBlocks into a stable JSON string, which we can use
 	// to rerender the map as needed without unnecessarily causing it to
@@ -146,6 +154,7 @@ const MapPreview = ( {
 		// realm, so mapbox accepts it, while the node renders in the canvas.
 		const mapContainer = document.createElement( 'div' );
 		mapContainer.style.minHeight = '250px';
+		mapContainer.style.height = '100%';
 		containerRef.current.appendChild( mapContainer );
 
 		mapboxgl.accessToken = hmMap.apiKey;
@@ -160,7 +169,7 @@ const MapPreview = ( {
 			renderWorldCopies: false,
 			scrollZoom: false,
 			style: mapStyle || 'mapbox://styles/mapbox/light-v11',
-			zoom: zoom || 1,
+			zoom: zoom ?? 1,
 		} );
 
 		map.addControl( fullScreenControl );
@@ -168,6 +177,10 @@ const MapPreview = ( {
 		const slideMarkers = JSON.parse( serializedFeatures );
 
 		map.on( 'load', () => {
+			// The container may have changed size since creation (iframed canvas).
+			map.resize();
+			map.jumpTo( viewRef.current );
+
 			// For clustering we need to add a data source.
 			map.addSource( 'markers', {
 				type: 'geojson',
@@ -255,7 +268,7 @@ const MapPreview = ( {
 			map.setCenter( [ longitude || 0, latitude || 0 ] );
 			map.setMinZoom( minZoom );
 			map.setMaxZoom( maxZoom );
-			map.setZoom( zoom || 1 );
+			map.setZoom( zoom ?? 1 );
 		}
 	}, [ projection, latitude, longitude, zoom, minZoom, maxZoom ] );
 
